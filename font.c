@@ -73,12 +73,6 @@ font_load(const char *family, u32 size) {
 	return ft;
 }
 
-extern void
-font_free(font_t *ft) {
-	FT_Done_FreeType(ft->library);
-	free(ft);
-}
-
 extern FT_GlyphSlot
 font_get_glyph(font_t *ft, char c) {
 	if (FT_Load_Glyph(ft->face, FT_Get_Char_Index(ft->face, c), 0))
@@ -88,4 +82,10 @@ font_get_glyph(font_t *ft, char c) {
 		die("error while calling FT_Render_Glyph()");
 
 	return ft->face->glyph;
+}
+
+extern void
+font_free(font_t *ft) {
+	FT_Done_FreeType(ft->library);
+	free(ft);
 }

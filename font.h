@@ -17,10 +17,10 @@ typedef struct font font_t;
 extern font_t *
 font_load(const char *family, u32 size);
 
-extern void
-font_free(font_t *ft);
-
 extern FT_GlyphSlot
 font_get_glyph(font_t *ft, char c);
+
+extern void
+font_free(font_t *ft);
 
 #endif
