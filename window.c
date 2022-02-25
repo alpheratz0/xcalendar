@@ -111,9 +111,9 @@ window_loop(window_t *wnd) {
 			case XCB_BUTTON_RELEASE:
 				free(ev);
 				return;
-			case XCB_KEY_RELEASE:
+			case XCB_KEY_PRESS:
 				/* check if esc key is pressed */
-				if (((xcb_key_release_event_t *)(ev))->detail == 9) {
+				if (((xcb_key_press_event_t *)(ev))->detail == 9) {
 					free(ev);
 					return;
 				}
