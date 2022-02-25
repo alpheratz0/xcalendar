@@ -16,11 +16,11 @@ text_render_char(bitmap_t *bmp, font_t *ft, u32 x, u32 y, u32 foreground, u32 ba
 
 	for (u32 i = 0; i < glyph_h; ++i) {
 		for (u32 j = 0; j < glyph_w; ++j) {
-			u32 xoffset = glyph->bitmap_left + x + j;
-			u32 yoffset = ft->size - glyph->bitmap_top + y + i;
+			u32 xmap = x + j + glyph->bitmap_left;
+			u32 ymap = y + i - glyph->bitmap_top + ft->size;
 			u8  gray = glyph->bitmap.buffer[i*glyph_w+j];
 
-			bitmap_set_safe(bmp, xoffset, yoffset, clerp(background, foreground, gray));
+			bitmap_set_safe(bmp, xmap, ymap, clerp(background, foreground, gray));
 		}
 	}
 }
