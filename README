@@ -1,0 +1,11 @@
+xcalendar
+=========
+show the current month
+
+build
+=====
+$ make
+
+install
+=======
+$ sudo make install
