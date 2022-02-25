@@ -29,11 +29,12 @@ calendar_from_today(font_t *ft, u32 foreground, u32 background) {
 	cal->bitmap = bitmap_alloc(width, height, background);
 
 	/* render month name */
-	u32 left_padding = (width - (strlen(di.month_name)-1)*ft->width) / 2;
-	text_render(cal->bitmap, ft, left_padding, ypos, foreground, background, di.month_name);
+	xpos = (width - (strlen(di.month_name) - 1) * ft->width) / 2;
+	text_render(cal->bitmap, ft, xpos, ypos, foreground, background, di.month_name);
 	ypos += ft->line_height;
 
 	/* render day names */
+	xpos = 0;
 	text_render(cal->bitmap, ft, 0, ypos, foreground, background, " Su Mo Tu We Th Fr Sa");
 	ypos += ft->line_height;
 
