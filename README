@@ -1,6 +1,6 @@
 xcalendar
 =========
-show the current month
+show the current month, preview: https://i.imgur.com/LJJVsXt.mp4
 
 build
 =====
@@ -9,3 +9,5 @@ $ make
 install
 =======
 $ sudo make install
+
+
