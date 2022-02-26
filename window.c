@@ -4,6 +4,7 @@
 #include <xcb/xcb_image.h>
 #include <xcb/xproto.h>
 
+#include "numdef.h"
 #include "bitmap.h"
 #include "debug.h"
 #include "window.h"
@@ -36,7 +37,7 @@ window_init(const char *wm_name, const char *wm_class, u32 background) {
 		wnd->screen->root, 0, 0, wnd->screen->width_in_pixels, wnd->screen->height_in_pixels, 0,
 		XCB_WINDOW_CLASS_INPUT_OUTPUT, wnd->screen->root_visual,
 		XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK,
-		(const unsigned int[2]) {
+		(const u32[2]) {
 			background,
 			XCB_EVENT_MASK_EXPOSURE |
 			XCB_EVENT_MASK_BUTTON_PRESS |
@@ -63,7 +64,7 @@ window_init(const char *wm_name, const char *wm_class, u32 background) {
 
 	xcb_change_window_attributes(
 		wnd->connection, wnd->window, XCB_CW_OVERRIDE_REDIRECT,
-		(const unsigned int[1]) { 0x1 }
+		(const u32[1]) { 0x1 }
 	);
 
 	xcb_map_window(wnd->connection, wnd->window);
