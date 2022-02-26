@@ -20,7 +20,7 @@ font_search(const char *family) {
 		if ((match = FcFontMatch(0, pattern, &result))) {
 			FcValue v;
 			FcPatternGet(match, FC_FILE, 0, &v);
-			path = strdup((char *)(v.u.f));
+			path = strdup((char *)(v.u.s));
 			FcPatternDestroy(match);
 		}
 
