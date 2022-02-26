@@ -12,7 +12,7 @@ bitmap_alloc(u32 width, u32 height, u32 color) {
 		bmp->width = width;
 		bmp->height = height;
 		if ((bmp->px = malloc(4*width*height))) {
-			for (u32 i = 0; i < width * height; i++)
+			for (u32 i = 0; i < width * height; ++i)
 				bmp->px[i] = color;
 			return bmp;
 		}
