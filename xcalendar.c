@@ -3,7 +3,8 @@
 #include "config.h"
 #include "window.h"
 
-int main(void) {
+int
+main(void) {
 	font_t *ft = font_load(font_family, font_size);
 	calendar_t *cal = calendar_from_today(ft, foreground, background);
 
