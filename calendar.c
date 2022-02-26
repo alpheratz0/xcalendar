@@ -35,7 +35,7 @@ calendar_from_today(font_t *ft, u32 foreground, u32 background) {
 
 	/* render day names */
 	xpos = 0;
-	text_render(cal->bitmap, ft, 0, ypos, foreground, background, " Su Mo Tu We Th Fr Sa");
+	text_render(cal->bitmap, ft, xpos, ypos, foreground, background, " Su Mo Tu We Th Fr Sa");
 	ypos += ft->line_height;
 
 	/* render day numbers */
