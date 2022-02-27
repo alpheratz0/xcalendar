@@ -35,6 +35,7 @@ install: all
 
 uninstall:
 	@rm -f ${DESTDIR}${PREFIX}/bin/xcalendar
+	@rm -f ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
 
 clean:
 	@rm -f xcalendar ${OBJ}
