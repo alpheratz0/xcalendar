@@ -30,7 +30,7 @@ window_init(const char *wm_name, const char *wm_class, u32 background) {
 		die("can't get default screen");
 	}
 
-    wnd->window = xcb_generate_id(wnd->connection);
+	wnd->window = xcb_generate_id(wnd->connection);
 
 	xcb_void_cookie_t window_cookie = xcb_create_window_checked(
 		wnd->connection, XCB_COPY_FROM_PARENT, wnd->window,
@@ -77,19 +77,19 @@ window_init(const char *wm_name, const char *wm_class, u32 background) {
 
 extern void
 window_create_pixmap(window_t *wnd, bitmap_t *bmp) {
-    wnd->gc = xcb_generate_id(wnd->connection);
-    wnd->pixmap = xcb_generate_id(wnd->connection);
+	wnd->gc = xcb_generate_id(wnd->connection);
+	wnd->pixmap = xcb_generate_id(wnd->connection);
 
-    wnd->image = xcb_image_create_native(
+	wnd->image = xcb_image_create_native(
 		wnd->connection, bmp->width, bmp->height,
-        XCB_IMAGE_FORMAT_Z_PIXMAP, wnd->screen->root_depth,
-        bmp->px, 4*bmp->width*bmp->height, (u8 *)(bmp->px)
+		XCB_IMAGE_FORMAT_Z_PIXMAP, wnd->screen->root_depth,
+		bmp->px, 4*bmp->width*bmp->height, (u8 *)(bmp->px)
 	);
 
-    xcb_create_pixmap(wnd->connection, wnd->screen->root_depth, wnd->pixmap, wnd->window, bmp->width, bmp->height);
-    xcb_create_gc(wnd->connection, wnd->gc, wnd->pixmap, 0, 0);
+	xcb_create_pixmap(wnd->connection, wnd->screen->root_depth, wnd->pixmap, wnd->window, bmp->width, bmp->height);
+	xcb_create_gc(wnd->connection, wnd->gc, wnd->pixmap, 0, 0);
 
-    xcb_flush(wnd->connection);
+	xcb_flush(wnd->connection);
 }
 
 extern void

@@ -10,7 +10,7 @@ static const char *mnames[] = {
 extern dateinfo_t
 dateinfo_from_today(void) {
 	time_t ts = time(NULL);
-    struct tm *now = localtime(&ts);
+	struct tm *now = localtime(&ts);
 	dateinfo_t di_today = { 0 };
 
 	di_today.day = now->tm_mday;
