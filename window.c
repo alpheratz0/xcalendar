@@ -68,9 +68,10 @@ window_init(const char *wm_name, const char *wm_class, u32 background) {
 	);
 
 	xcb_map_window(wnd->connection, wnd->window);
-	xcb_flush(wnd->connection);
 
 	xcb_set_input_focus(wnd->connection, XCB_INPUT_FOCUS_POINTER_ROOT, wnd->window, XCB_CURRENT_TIME);
+
+	xcb_flush(wnd->connection);
 
 	return wnd;
 }
@@ -86,8 +87,6 @@ window_create_image(window_t *wnd, bitmap_t *bmp) {
 	);
 
 	xcb_create_gc(wnd->connection, wnd->gc, wnd->window, 0, 0);
-
-	xcb_flush(wnd->connection);
 }
 
 extern void
@@ -113,7 +112,6 @@ window_loop(window_t *wnd) {
 					0
 				);
 
-				xcb_flush(wnd->connection);
 				break;
 			}
 			case XCB_BUTTON_RELEASE:
