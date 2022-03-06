@@ -19,8 +19,14 @@ font_search(const char *family) {
 
 		if ((match = FcFontMatch(0, pattern, &result))) {
 			FcValue v;
-			FcPatternGet(match, FC_FILE, 0, &v);
-			path = strdup((char *)(v.u.s));
+
+			FcPatternGet(match, FC_FAMILY, 0, &v);
+
+			if (strcmp(family, (char *)(v.u.s)) == 0) {
+				FcPatternGet(match, FC_FILE, 0, &v);
+				path = strdup((char *)(v.u.s));
+			}
+
 			FcPatternDestroy(match);
 		}
 
