@@ -76,9 +76,8 @@ window_init(const char *wm_name, const char *wm_class, u32 background) {
 }
 
 extern void
-window_create_pixmap(window_t *wnd, bitmap_t *bmp) {
+window_create_image(window_t *wnd, bitmap_t *bmp) {
 	wnd->gc = xcb_generate_id(wnd->connection);
-	wnd->pixmap = xcb_generate_id(wnd->connection);
 
 	wnd->image = xcb_image_create_native(
 		wnd->connection, bmp->width, bmp->height,
@@ -86,8 +85,7 @@ window_create_pixmap(window_t *wnd, bitmap_t *bmp) {
 		bmp->px, 4*bmp->width*bmp->height, (u8 *)(bmp->px)
 	);
 
-	xcb_create_pixmap(wnd->connection, wnd->screen->root_depth, wnd->pixmap, wnd->window, bmp->width, bmp->height);
-	xcb_create_gc(wnd->connection, wnd->gc, wnd->pixmap, 0, 0);
+	xcb_create_gc(wnd->connection, wnd->gc, wnd->window, 0, 0);
 
 	xcb_flush(wnd->connection);
 }
@@ -100,12 +98,21 @@ window_loop(window_t *wnd) {
 		switch (ev->response_type & ~0x80) {
 			case XCB_EXPOSE: {
 				xcb_expose_event_t *eev = (xcb_expose_event_t *)(ev);
-				xcb_image_put(wnd->connection, wnd->pixmap, wnd->gc, wnd->image, 0, 0, 0);
-				xcb_clear_area(wnd->connection, 0, wnd->window, 0, 0, eev->width, eev->height);
-				xcb_copy_area(wnd->connection, wnd->pixmap, wnd->window,
-						wnd->gc, 0, 0, (eev->width - wnd->image->width) / 2,
-						(eev->height - wnd->image->height) / 2,
-						wnd->image->width, wnd->image->height);
+
+				xcb_clear_area(
+					wnd->connection, 0,
+					wnd->window, 0, 0,
+					eev->width, eev->height
+				);
+
+				xcb_image_put(
+					wnd->connection,
+					wnd->window, wnd->gc, wnd->image,
+					(eev->width - wnd->image->width) / 2,
+					(eev->height - wnd->image->height) / 2,
+					0
+				);
+
 				xcb_flush(wnd->connection);
 				break;
 			}
@@ -130,7 +137,6 @@ window_loop(window_t *wnd) {
 extern void
 window_free(window_t *wnd) {
 	xcb_free_gc(wnd->connection, wnd->gc);
-	xcb_free_pixmap(wnd->connection, wnd->pixmap);
 	xcb_disconnect(wnd->connection);
 	free(wnd->image);
 	free(wnd);

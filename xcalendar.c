@@ -9,7 +9,7 @@ main(void) {
 	calendar_t *cal = calendar_from_today(ft, foreground, background);
 
 	window_t *wnd = window_init("xcalendar", "xcalendar", background);
-	window_create_pixmap(wnd, cal->bitmap);
+	window_create_image(wnd, cal->bitmap);
 	window_loop(wnd);
 
 	font_free(ft);
