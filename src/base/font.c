@@ -4,6 +4,7 @@
 #include <fontconfig/fontconfig.h>
 
 #include "../util/debug.h"
+#include "../util/numdef.h"
 #include "font.h"
 
 static char *
@@ -40,58 +41,60 @@ font_search(const char *family) {
 extern font_t *
 font_load(const char *family, u32 size) {
 	char *path;
-	font_t *ft;
+	font_t *font;
 
 	if (!(path = font_search(family))) {
 		dief("font family not found: %s", family);
 	}
 
-	if (!(ft = malloc(sizeof(font_t)))) {
+	if (!(font = malloc(sizeof(font_t)))) {
 		die("error while calling malloc, no memory available");
 	}
 
-	if (FT_Init_FreeType(&ft->library)) {
+	if (FT_Init_FreeType(&font->library)) {
 		die("error while calling FT_Init_FreeType()");
 	}
 
-	if (FT_New_Face(ft->library, path, 0, &(ft->face))) {
+	if (FT_New_Face(font->library, path, 0, &(font->face))) {
 		die("error while calling FT_New_Face()");
 	}
 
-	if (FT_Set_Char_Size(ft->face, 0, size * 64, 72, 72)) {
+	if (FT_Set_Char_Size(font->face, 0, size * 64, 72, 72)) {
 		die("error while calling FT_Set_Char_Size()");
 	}
 
-	if (FT_Load_Glyph(ft->face, FT_Get_Char_Index(ft->face, '0'), 0)) {
+	if (FT_Load_Glyph(font->face, FT_Get_Char_Index(font->face, '0'), 0)) {
 		die("error while calling FT_Load_Glyph()");
 	}
 
-	if (FT_Render_Glyph(ft->face->glyph, FT_RENDER_MODE_NORMAL)) {
+	if (FT_Render_Glyph(font->face->glyph, FT_RENDER_MODE_NORMAL)) {
 		die("error while calling FT_Render_Glyph()");
 	}
 
-	ft->size = size;
-	ft->width = ft->face->glyph->advance.x >> 6;
-	ft->line_height = (ft->face->size->metrics.ascender - ft->face->size->metrics.descender) >> 6;
+	font->size = size;
+	font->width = font->face->glyph->advance.x >> 6;
+	font->height = (font->face->size->metrics.ascender - font->face->size->metrics.descender) >> 6;
 
 	free(path);
 
-	return ft;
+	return font;
 }
 
 extern FT_GlyphSlot
-font_get_glyph(font_t *ft, char c) {
-	if (FT_Load_Glyph(ft->face, FT_Get_Char_Index(ft->face, c), 0))
+font_get_glyph(font_t *font, char c) {
+	if (FT_Load_Glyph(font->face, FT_Get_Char_Index(font->face, c), 0)) {
 		die("error while calling FT_Load_Glyph()");
+	}
 
-	if (FT_Render_Glyph(ft->face->glyph, FT_RENDER_MODE_NORMAL))
+	if (FT_Render_Glyph(font->face->glyph, FT_RENDER_MODE_NORMAL)) {
 		die("error while calling FT_Render_Glyph()");
+	}
 
-	return ft->face->glyph;
+	return font->face->glyph;
 }
 
 extern void
-font_free(font_t *ft) {
-	FT_Done_FreeType(ft->library);
-	free(ft);
+font_unload(font_t *font) {
+	FT_Done_FreeType(font->library);
+	free(font);
 }

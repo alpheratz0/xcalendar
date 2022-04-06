@@ -9,7 +9,7 @@
 
 static void
 text_render_char(bitmap_t *bmp, font_t *ft, u32 x, u32 y, u32 foreground, u32 background, char c) {
-	bitmap_rect(bmp, x, y, ft->width, ft->line_height, background);
+	bitmap_rect(bmp, x, y, ft->width, ft->height, background);
 
 	FT_GlyphSlot glyph = font_get_glyph(ft, c);
 	u32 glyph_h = glyph->bitmap.rows;

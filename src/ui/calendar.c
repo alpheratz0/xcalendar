@@ -22,7 +22,7 @@ calendar_from_today(font_t *ft, u32 foreground, u32 background) {
 
 	char buff[3];
 	u32 width = ft->width * 21;
-	u32 height = ft->line_height * 7;
+	u32 height = ft->height * 7;
 	u32 ypos = 0;
 	u32 xpos = 0;
 
@@ -31,12 +31,12 @@ calendar_from_today(font_t *ft, u32 foreground, u32 background) {
 	/* render month name */
 	xpos = (width - (strlen(di.month_name) - 1) * ft->width) / 2;
 	text_render(cal->bitmap, ft, xpos, ypos, foreground, background, di.month_name);
-	ypos += ft->line_height;
+	ypos += ft->height;
 
 	/* render day names */
 	xpos = 0;
 	text_render(cal->bitmap, ft, xpos, ypos, foreground, background, " Su Mo Tu We Th Fr Sa");
-	ypos += ft->line_height;
+	ypos += ft->height;
 
 	/* render day numbers */
 	xpos = ft->width * di.firstday_weekday * 3;
@@ -51,7 +51,7 @@ calendar_from_today(font_t *ft, u32 foreground, u32 background) {
 		xpos += (3 - spaces) * ft->width;
 		if (xpos == cal->bitmap->width) {
 			xpos = 0;
-			ypos += ft->line_height;
+			ypos += ft->height;
 		}
 	}
 

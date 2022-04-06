@@ -75,7 +75,7 @@ main(int argc, char **argv) {
 	window_create_image(window, calendar->bitmap);
 	window_loop(window);
 
-	font_free(font);
+	font_unload(font);
 	calendar_free(calendar);
 	window_free(window);
 
