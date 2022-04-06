@@ -6,21 +6,30 @@ INCS = -I/usr/include -I/usr/include/freetype2
 CFLAGS = -pedantic -Wall -Wextra -Os ${INCS}
 CC = cc
 
-SRC = bitmap.c \
-	  calendar.c \
-	  dateinfo.c \
-	  debug.c \
-	  font.c \
-	  xcalendar.c \
-	  text.c \
-	  window.c \
-	  color.c
+SRC = src/bitmap.c \
+	  src/calendar.c \
+	  src/dateinfo.c \
+	  src/debug.c \
+	  src/font.c \
+	  src/xcalendar.c \
+	  src/text.c \
+	  src/window.c \
+	  src/color.c
 
 OBJ = ${SRC:.c=.o}
 
 all: xcalendar
 
-${OBJ}: bitmap.h calendar.h dateinfo.h debug.h font.h numdef.h text.h window.h color.h config.h
+${OBJ}: src/bitmap.h \
+		src/calendar.h \
+		src/dateinfo.h \
+		src/debug.h \
+		src/font.h \
+		src/numdef.h \
+		src/text.h \
+		src/window.h \
+		src/color.h \
+		src/config.h
 
 xcalendar: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDFLAGS}
@@ -30,7 +39,7 @@ install: all
 	@cp -f xcalendar ${DESTDIR}${PREFIX}/bin
 	@chmod 755 ${DESTDIR}${PREFIX}/bin/xcalendar
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	@cp -f xcalendar.1 ${DESTDIR}${MANPREFIX}/man1
+	@cp -f man/xcalendar.1 ${DESTDIR}${MANPREFIX}/man1
 	@chmod 644 ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
 
 uninstall:
