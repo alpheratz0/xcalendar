@@ -75,5 +75,6 @@ main(int argc, char **argv) {
 	font_free(ft);
 	calendar_free(cal);
 	window_free(wnd);
+
 	return 0;
 }
