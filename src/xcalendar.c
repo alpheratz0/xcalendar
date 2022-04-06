@@ -15,13 +15,56 @@
 
 */
 
+#include <stdbool.h>
+#include <string.h>
+
+#include "debug.h"
 #include "font.h"
 #include "calendar.h"
 #include "config.h"
 #include "window.h"
 
+static bool
+match_opt(const char *in, const char *sh, const char *lo) {
+	return (strcmp(in, sh) == 0) ||
+		   (strcmp(in, lo) == 0);
+}
+
+static void
+usage(void) {
+	puts("Usage: xcalendar [ -hkv ]");
+	puts("Options are:");
+	puts("     -h | --help                    display this message and exit");
+	puts("     -k | --keybindings             display the keybindings");
+	puts("     -v | --version                 display the program version");
+	exit(0);
+}
+
+static void
+keybindings(void) {
+	puts("Keybindings are:");
+	puts("esc: exit");
+	exit(0);
+}
+
+static void
+version(void) {
+	puts("xcalendar version "VERSION);
+	exit(0);
+}
+
 int
-main(void) {
+main(int argc, char **argv) {
+	/* skip program name */
+	--argc; ++argv;
+
+	if (argc > 0) {
+		if (match_opt(*argv, "-k", "--keybindings")) keybindings();
+		else if (match_opt(*argv, "-h", "--help")) usage();
+		else if (match_opt(*argv, "-v", "--version")) version();
+		else dief("invalid option %s", *argv);
+	}
+
 	font_t *ft = font_load(font_family, font_size);
 	calendar_t *cal = calendar_from_today(ft, foreground, background);
 
