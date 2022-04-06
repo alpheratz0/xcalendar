@@ -2,10 +2,6 @@ xcalendar
 =========
 show the current month, preview: https://i.imgur.com/LJJVsXt.mp4
 
-config
-======
-edit config.h to change the font (only monospaced), font size and colors
-
 build
 =====
 in order to build xcalendar you will need xcb, freetype and fontconfig headers
