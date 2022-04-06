@@ -1,7 +1,7 @@
 #ifndef __XCALENDAR_BITMAP_H__
 #define __XCALENDAR_BITMAP_H__
 
-#include "numdef.h"
+#include "../util/numdef.h"
 
 struct bitmap {
 	u32     *px;

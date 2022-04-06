@@ -1,9 +1,9 @@
 #ifndef __XCALENDAR_CALENDAR_H__
 #define __XCALENDAR_CALENDAR_H__
 
-#include "font.h"
-#include "bitmap.h"
-#include "numdef.h"
+#include "../base/font.h"
+#include "../base/bitmap.h"
+#include "../util/numdef.h"
 
 struct calendar {
 	bitmap_t     *bitmap;

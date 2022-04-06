@@ -4,9 +4,9 @@
 #include <xcb/xcb_image.h>
 #include <xcb/xproto.h>
 
-#include "numdef.h"
-#include "bitmap.h"
-#include "debug.h"
+#include "../base/bitmap.h"
+#include "../util/numdef.h"
+#include "../util/debug.h"
 #include "window.h"
 
 extern window_t *

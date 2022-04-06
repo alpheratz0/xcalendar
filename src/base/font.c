@@ -3,7 +3,7 @@
 #include <freetype/freetype.h>
 #include <fontconfig/fontconfig.h>
 
-#include "debug.h"
+#include "../util/debug.h"
 #include "font.h"
 
 static char *

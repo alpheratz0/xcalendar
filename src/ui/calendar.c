@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "bitmap.h"
-#include "font.h"
-#include "dateinfo.h"
-#include "numdef.h"
-#include "debug.h"
+#include "../base/bitmap.h"
+#include "../base/font.h"
+#include "../base/dateinfo.h"
+#include "../util/numdef.h"
+#include "../util/debug.h"
 #include "text.h"
 #include "calendar.h"
 

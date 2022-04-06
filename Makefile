@@ -7,30 +7,29 @@ INCS = -I/usr/include -I/usr/include/freetype2
 CFLAGS = -pedantic -Wall -Wextra -Os ${INCS} -DVERSION=\"${VERSION}\"
 CC = cc
 
-SRC = src/bitmap.c \
-	  src/calendar.c \
-	  src/dateinfo.c \
-	  src/debug.c \
-	  src/font.c \
+SRC = src/base/bitmap.c \
+	  src/base/font.c \
+	  src/base/dateinfo.c \
 	  src/xcalendar.c \
-	  src/text.c \
-	  src/window.c \
-	  src/color.c
+	  src/ui/calendar.c \
+	  src/ui/text.c \
+	  src/x11/window.c \
+	  src/util/color.c \
+	  src/util/debug.c
 
 OBJ = ${SRC:.c=.o}
 
 all: xcalendar
 
-${OBJ}: src/bitmap.h \
-		src/calendar.h \
-		src/dateinfo.h \
-		src/debug.h \
-		src/font.h \
-		src/numdef.h \
-		src/text.h \
-		src/window.h \
-		src/color.h \
-		src/config.h
+${OBJ}: src/base/font.h \
+		src/base/dateinfo.h \
+		src/base/bitmap.h \
+		src/ui/calendar.h \
+		src/ui/text.h \
+		src/x11/window.h \
+		src/util/debug.h \
+		src/util/color.h \
+		src/util/numdef.h
 
 xcalendar: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDFLAGS}

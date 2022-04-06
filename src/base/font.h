@@ -2,7 +2,8 @@
 #define __XCALENDAR_FONT_H__
 
 #include <freetype/freetype.h>
-#include "numdef.h"
+
+#include "../util/numdef.h"
 
 struct font {
 	FT_Library library;

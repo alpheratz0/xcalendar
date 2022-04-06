@@ -1,10 +1,11 @@
 #include <freetype/freetype.h>
 
-#include "bitmap.h"
-#include "font.h"
-#include "debug.h"
-#include "color.h"
-#include "numdef.h"
+#include "../base/bitmap.h"
+#include "../base/font.h"
+#include "../util/debug.h"
+#include "../util/color.h"
+#include "../util/numdef.h"
+#include "text.h"
 
 static void
 text_render_char(bitmap_t *bmp, font_t *ft, u32 x, u32 y, u32 foreground, u32 background, char c) {

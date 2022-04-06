@@ -1,7 +1,7 @@
 #ifndef __XCALENDAR_DATEINFO_H__
 #define __XCALENDAR_DATEINFO_H__
 
-#include "numdef.h"
+#include "../util/numdef.h"
 
 struct dateinfo {
 	u32     day;

@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include "debug.h"
+
 extern void
 die(const char *err) {
 	fprintf(stderr, "xcalendar: %s\n", err);
