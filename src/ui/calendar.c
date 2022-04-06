@@ -26,7 +26,7 @@ calendar_from_today(font_t *ft, u32 foreground, u32 background) {
 	u32 ypos = 0;
 	u32 xpos = 0;
 
-	cal->bitmap = bitmap_alloc(width, height, background);
+	cal->bitmap = bitmap_create(width, height, background);
 
 	/* render month name */
 	xpos = (width - (strlen(di.month_name) - 1) * ft->width) / 2;

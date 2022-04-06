@@ -5,15 +5,16 @@
 #include "bitmap.h"
 
 extern bitmap_t *
-bitmap_alloc(u32 width, u32 height, u32 color) {
+bitmap_create(u32 width, u32 height, u32 color) {
 	bitmap_t *bmp;
 
 	if ((bmp = malloc(sizeof(bitmap_t)))) {
 		bmp->width = width;
 		bmp->height = height;
 		if ((bmp->px = malloc(4*width*height))) {
-			for (u32 i = 0; i < width * height; ++i)
+			for (u32 i = 0; i < width * height; ++i) {
 				bmp->px[i] = color;
+			}
 			return bmp;
 		}
 	}
@@ -25,13 +26,14 @@ bitmap_alloc(u32 width, u32 height, u32 color) {
 
 extern void
 bitmap_set(bitmap_t *bmp, u32 x, u32 y, u32 color) {
-	bmp->px[y*bmp->width+x] = color;
+	if (x < bmp->width && y < bmp->height) {
+		bmp->px[y*bmp->width+x] = color;
+	}
 }
 
 extern void
-bitmap_set_safe(bitmap_t *bmp, u32 x, u32 y, u32 color) {
-	if (x < bmp->width && y < bmp->height)
-		bitmap_set(bmp, x, y, color);
+bitmap_set_unsafe(bitmap_t *bmp, u32 x, u32 y, u32 color) {
+	bmp->px[y*bmp->width+x] = color;
 }
 
 extern void

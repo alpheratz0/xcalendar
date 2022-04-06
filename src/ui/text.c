@@ -21,7 +21,7 @@ text_render_char(bitmap_t *bmp, font_t *ft, u32 x, u32 y, u32 foreground, u32 ba
 			u32 ymap = y + i - glyph->bitmap_top + ft->size;
 			u8  gray = glyph->bitmap.buffer[i*glyph_w+j];
 
-			bitmap_set_safe(bmp, xmap, ymap, clerp(background, foreground, gray));
+			bitmap_set(bmp, xmap, ymap, clerp(background, foreground, gray));
 		}
 	}
 }
