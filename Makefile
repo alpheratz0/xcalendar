@@ -1,9 +1,10 @@
+VERSION = 0.1.0
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
 LDLIBS = -lxcb -lfreetype -lxcb-image -lfontconfig
 LDFLAGS = -s ${LDLIBS}
 INCS = -I/usr/include -I/usr/include/freetype2
-CFLAGS = -pedantic -Wall -Wextra -Os ${INCS}
+CFLAGS = -pedantic -Wall -Wextra -Os ${INCS} -DVERSION=\"${VERSION}\"
 CC = cc
 
 SRC = src/bitmap.c \
@@ -42,11 +43,18 @@ install: all
 	@cp -f man/xcalendar.1 ${DESTDIR}${MANPREFIX}/man1
 	@chmod 644 ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
 
+dist: clean
+	@mkdir -p xcalendar-${VERSION}
+	@cp -R LICENSE Makefile README man src xcalendar-${VERSION}
+	@tar -cf xcalendar-${VERSION}.tar xcalendar-${VERSION}
+	@gzip xcalendar-${VERSION}.tar
+	@rm -rf xcalendar-${VERSION}
+
 uninstall:
 	@rm -f ${DESTDIR}${PREFIX}/bin/xcalendar
 	@rm -f ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
 
 clean:
-	@rm -f xcalendar ${OBJ}
+	@rm -f xcalendar xcalendar-${VERSION}.tar.gz ${OBJ}
 
-.PHONY: all clean install uninstall
+.PHONY: all clean install uninstall dist
