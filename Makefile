@@ -27,6 +27,7 @@ ${OBJ}: src/base/font.h \
 		src/ui/calendar.h \
 		src/ui/label.h \
 		src/x11/window.h \
+		src/x11/keys.h \
 		src/util/debug.h \
 		src/util/color.h \
 		src/util/numdef.h

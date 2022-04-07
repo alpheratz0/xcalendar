@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <xcb/xcb.h>
@@ -9,133 +10,186 @@
 #include "../util/debug.h"
 #include "window.h"
 
-extern window_t *
-window_init(const char *wm_name, const char *wm_class, u32 background) {
-	window_t *wnd;
+static xcb_atom_t
+x11_get_atom(window_t *window, const char *name) {
+	xcb_atom_t atom;
+	xcb_intern_atom_reply_t *reply;
 
-	if (!(wnd = malloc(sizeof(window_t)))) {
+	reply = xcb_intern_atom_reply(
+		window->connection,
+		xcb_intern_atom_unchecked(
+			window->connection, 1,
+			strlen(name), name
+		),
+		NULL
+	);
+
+	atom = reply->atom;
+	free(reply);
+
+	return atom;
+}
+
+extern window_t *
+window_create(const char *wm_name, const char *wm_class) {
+	window_t *window;
+
+	if (!(window = malloc(sizeof(window_t)))) {
 		die("error while calling malloc, no memory available");
 	}
 
-	wnd->connection = xcb_connect(NULL, NULL);
-
-	if (xcb_connection_has_error(wnd->connection)) {
+	if (xcb_connection_has_error((window->connection = xcb_connect(NULL, NULL)))) {
 		die("can't open display");
 	}
 
-	wnd->screen = xcb_setup_roots_iterator(xcb_get_setup(wnd->connection)).data;
-
-	if (!wnd->screen) {
-		xcb_disconnect(wnd->connection);
+	if (!(window->screen = xcb_setup_roots_iterator(xcb_get_setup(window->connection)).data)) {
+		xcb_disconnect(window->connection);
 		die("can't get default screen");
 	}
 
-	wnd->window = xcb_generate_id(wnd->connection);
+	window->id = xcb_generate_id(window->connection);
+	window->bmp = bitmap_create(window->screen->width_in_pixels, window->screen->height_in_pixels, 0x000000);
 
 	xcb_void_cookie_t window_cookie = xcb_create_window_checked(
-		wnd->connection, XCB_COPY_FROM_PARENT, wnd->window,
-		wnd->screen->root, 0, 0, wnd->screen->width_in_pixels, wnd->screen->height_in_pixels, 0,
-		XCB_WINDOW_CLASS_INPUT_OUTPUT, wnd->screen->root_visual,
+		window->connection, XCB_COPY_FROM_PARENT, window->id,
+		window->screen->root, 0, 0, window->bmp->width, window->bmp->height, 0,
+		XCB_WINDOW_CLASS_INPUT_OUTPUT, window->screen->root_visual,
 		XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK,
 		(const u32[2]) {
-			background,
+			0x000000,
 			XCB_EVENT_MASK_EXPOSURE |
-			XCB_EVENT_MASK_BUTTON_PRESS |
-			XCB_EVENT_MASK_BUTTON_RELEASE |
 			XCB_EVENT_MASK_KEY_PRESS |
 			XCB_EVENT_MASK_KEY_RELEASE
 		}
 	);
 
-	if (xcb_request_check(wnd->connection, window_cookie)) {
-		xcb_disconnect(wnd->connection);
+	if (xcb_request_check(window->connection, window_cookie)) {
+		xcb_disconnect(window->connection);
 		die("can't create window");
 	}
 
 	xcb_change_property(
-		wnd->connection, XCB_PROP_MODE_REPLACE, wnd->window, XCB_ATOM_WM_NAME,
+		window->connection, XCB_PROP_MODE_REPLACE, window->id, XCB_ATOM_WM_NAME,
 		XCB_ATOM_STRING, 8, strlen(wm_name), wm_name
 	);
 
+	/* set instance and class name */
+	/* see: https://x.org/releases/X11R7.6/doc/xorg-docs/specs/ICCCM/icccm.html */
+	size_t class_size = sizeof(char) * (2 + strlen(wm_class) * 2);
+	char *class = malloc(class_size);
+	sprintf(class, "%s%c%s", wm_class, '\0', wm_class);
+
 	xcb_change_property(
-		wnd->connection, XCB_PROP_MODE_REPLACE, wnd->window, XCB_ATOM_WM_CLASS,
-		XCB_ATOM_STRING, 8, strlen(wm_class), wm_class
+		window->connection,
+		XCB_PROP_MODE_REPLACE,
+		window->id,
+		XCB_ATOM_WM_CLASS,
+		XCB_ATOM_STRING, 8, class_size,
+		class
 	);
 
-	xcb_change_window_attributes(
-		wnd->connection, wnd->window, XCB_CW_OVERRIDE_REDIRECT,
-		(const u32[1]) { 0x1 }
+	free(class);
+
+	/* set fullscreen */
+	xcb_atom_t net_wm_state = x11_get_atom(window, "_NET_WM_STATE");
+	xcb_atom_t net_wm_state_fullscreen = x11_get_atom(window, "_NET_WM_STATE_FULLSCREEN");
+
+	xcb_change_property(
+		window->connection,
+		XCB_PROP_MODE_REPLACE,
+		window->id,
+		net_wm_state,
+		XCB_ATOM_ATOM, 32, 1,
+		&net_wm_state_fullscreen
 	);
 
-	xcb_map_window(wnd->connection, wnd->window);
+	/* set wm protocols */
+	xcb_atom_t wm_protocols = x11_get_atom(window, "WM_PROTOCOLS");
+	xcb_atom_t wm_delete_window = x11_get_atom(window, "WM_DELETE_WINDOW");
 
-	xcb_set_input_focus(wnd->connection, XCB_INPUT_FOCUS_POINTER_ROOT, wnd->window, XCB_CURRENT_TIME);
+	xcb_change_property(
+		window->connection,
+		XCB_PROP_MODE_REPLACE,
+		window->id,
+		wm_protocols,
+		XCB_ATOM_ATOM, 32, 1,
+		&wm_delete_window
+	);
 
-	xcb_flush(wnd->connection);
+	xcb_map_window(window->connection, window->id);
+	xcb_flush(window->connection);
 
-	return wnd;
+	window->running = 0;
+	window->gc = xcb_generate_id(window->connection);
+	window->image = xcb_image_create_native(
+		window->connection, window->bmp->width, window->bmp->height,
+		XCB_IMAGE_FORMAT_Z_PIXMAP, window->screen->root_depth,
+		window->bmp->px, 4*window->bmp->width*window->bmp->height, (u8 *)(window->bmp->px)
+	);
+
+	xcb_create_gc(window->connection, window->gc, window->id, 0, 0);
+
+	return window;
 }
 
 extern void
-window_create_image(window_t *wnd, bitmap_t *bmp) {
-	wnd->gc = xcb_generate_id(wnd->connection);
-
-	wnd->image = xcb_image_create_native(
-		wnd->connection, bmp->width, bmp->height,
-		XCB_IMAGE_FORMAT_Z_PIXMAP, wnd->screen->root_depth,
-		bmp->px, 4*bmp->width*bmp->height, (u8 *)(bmp->px)
-	);
-
-	xcb_create_gc(wnd->connection, wnd->gc, wnd->window, 0, 0);
-}
-
-extern void
-window_loop(window_t *wnd) {
+window_loop_start(window_t *window) {
 	xcb_generic_event_t *ev;
+	xcb_key_press_event_t *kpev;
+	xcb_client_message_event_t *cmev;
 
-	while ((ev = xcb_wait_for_event(wnd->connection))) {
-		switch (ev->response_type & ~0x80) {
-			case XCB_EXPOSE: {
-				xcb_expose_event_t *eev = (xcb_expose_event_t *)(ev);
+	window->running = 1;
 
-				xcb_clear_area(
-					wnd->connection, 0,
-					wnd->window, 0, 0,
-					eev->width, eev->height
-				);
+	while (window->running) {
+		if ((ev = xcb_wait_for_event(window->connection))) {
+			switch (ev->response_type & ~0x80) {
+				case XCB_CLIENT_MESSAGE:
+					cmev = (xcb_client_message_event_t *)(ev);
 
-				xcb_image_put(
-					wnd->connection,
-					wnd->window, wnd->gc, wnd->image,
-					(eev->width - wnd->image->width) / 2,
-					(eev->height - wnd->image->height) / 2,
-					0
-				);
+					/* end loop if the window manager sent a delete window message */
+					/* https://www.x.org/docs/ICCCM/icccm.pdf */
+					if (cmev->data.data32[0] == x11_get_atom(window, "WM_DELETE_WINDOW")) {
+						window_loop_end(window);
+					}
 
-				break;
+					break;
+				case XCB_EXPOSE:
+					xcb_image_put(window->connection, window->id, window->gc, window->image, 0, 0, 0);
+					break;
+				case XCB_KEY_PRESS:
+					kpev = (xcb_key_press_event_t *)(ev);
+					window->key_pressed(kpev->detail);
+					break;
+				default:
+					break;
 			}
-			case XCB_BUTTON_RELEASE:
-				free(ev);
-				return;
-			case XCB_KEY_PRESS:
-				/* check if esc key is pressed */
-				if (((xcb_key_press_event_t *)(ev))->detail == 9) {
-					free(ev);
-					return;
-				}
-				break;
-			default:
-				break;
-		}
 
-		free(ev);
+			free(ev);
+		}
 	}
 }
 
 extern void
-window_free(window_t *wnd) {
-	xcb_free_gc(wnd->connection, wnd->gc);
-	xcb_disconnect(wnd->connection);
-	free(wnd->image);
-	free(wnd);
+window_loop_end(window_t *window) {
+	window->running = 0;
+}
+
+extern void
+window_force_redraw(window_t *window) {
+	xcb_clear_area(window->connection, 1, window->id, 0, 0, 1, 1);
+	xcb_flush(window->connection);
+}
+
+extern void
+window_set_key_press_callback(window_t *window, window_key_press_callback_t cb) {
+	window->key_pressed = cb;
+}
+
+extern void
+window_free(window_t *window) {
+	xcb_free_gc(window->connection, window->gc);
+	xcb_disconnect(window->connection);
+	bitmap_free(window->bmp);
+	free(window->image);
+	free(window);
 }

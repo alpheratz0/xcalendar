@@ -9,61 +9,76 @@
 #include "label.h"
 #include "calendar.h"
 
+extern calendar_style_t
+calendar_style_from(u32 text_color, u32 current_day_background_color) {
+	calendar_style_t style;
+	style.text_color = text_color;
+	style.current_day_background_color = current_day_background_color;
+	return style;
+}
+
 extern calendar_t *
-calendar_from_today(font_t *ft, u32 foreground, u32 background) {
-	calendar_t *cal;
-	dateinfo_t di;
+calendar_create(font_t *font, dateinfo_t *dateinfo, calendar_style_t *style) {
+	calendar_t *calendar;
 
-	if (!(cal = malloc(sizeof(calendar_t)))) {
-		die("error while calling malloc, no memory available");
+	if ((calendar = malloc(sizeof(calendar_t)))) {
+		calendar->font = font;
+		calendar->dateinfo = dateinfo;
+		calendar->style = style;
+
+		return calendar;
 	}
 
-	di = dateinfo_from_today();
+	die("error while calling malloc, no memory available");
 
-	char buff[3];
-	u32 width = ft->width * 21;
-	u32 height = ft->height * 7;
-	u32 ypos = 0;
-	u32 xpos = 0;
-
-	cal->bitmap = bitmap_create(width, height, background);
-
-	/* render month name */
-	xpos = (width - (strlen(di.month_name) - 1) * ft->width) / 2;
-	label_render_onto(cal->bitmap, ft, foreground, di.month_name, xpos, ypos);
-	ypos += ft->height;
-
-	/* render day names */
-	xpos = 0;
-	label_render_onto(cal->bitmap, ft, foreground, " Su Mo Tu We Th Fr Sa", xpos, ypos);
-	ypos += ft->height;
-
-	/* render day numbers */
-	xpos = ft->width * di.firstday_weekday * 3;
-
-	for (u32 day = 1; day <= di.num_days_in_month; ++day) {
-		u8 spaces = day > 9 ? 1 : 2;
-		u32 fg = day == di.day ? background : foreground;
-		xpos += spaces * ft->width;
-		snprintf(buff, 3, "%d", day);
-
-		if (di.day == day) {
-			bitmap_rect(cal->bitmap, xpos, ypos, ft->width * (3 - spaces), ft->height, foreground);
-		}
-
-		label_render_onto(cal->bitmap, ft, fg, buff, xpos, ypos);
-		xpos += (3 - spaces) * ft->width;
-		if (xpos == cal->bitmap->width) {
-			xpos = 0;
-			ypos += ft->height;
-		}
-	}
-
-	return cal;
+	return (void *)(0);
 }
 
 extern void
-calendar_free(calendar_t *cal) {
-	bitmap_free(cal->bitmap);
-	free(cal);
+calendar_render_onto(calendar_t *calendar, bitmap_t *bmp) {
+	char buff[3];
+	u32 width = calendar->font->width * 21;
+	u32 height = calendar->font->height * 7;
+	u32 ypos = 0;
+	u32 xpos = 0;
+	u32 xstart = (bmp->width - width) / 2;
+	u32 ystart = (bmp->height - height) / 2;
+
+	/* render month name */
+	xpos = xstart + (width - (strlen(calendar->dateinfo->month_name) - 1) * calendar->font->width) / 2;
+	ypos = ystart;
+
+	label_render_onto(bmp, calendar->font, calendar->style->text_color, calendar->dateinfo->month_name, xpos, ypos);
+	ypos += calendar->font->height;
+
+	/* render day names */
+	xpos = xstart;
+	label_render_onto(bmp, calendar->font, calendar->style->text_color, " Su Mo Tu We Th Fr Sa", xpos, ypos);
+	ypos += calendar->font->height;
+
+	/* render day numbers */
+	xpos = xstart + calendar->font->width * calendar->dateinfo->firstday_weekday * 3;
+
+	for (u32 day = 1; day <= calendar->dateinfo->num_days_in_month; ++day) {
+		u8 spaces = day > 9 ? 1 : 2;
+		u32 fg = day == calendar->dateinfo->day ? calendar->style->current_day_background_color : calendar->style->text_color;
+		xpos += spaces * calendar->font->width;
+		snprintf(buff, 3, "%d", day);
+
+		if (calendar->dateinfo->day == day) {
+			bitmap_rect(bmp, xpos, ypos, calendar->font->width * (3 - spaces), calendar->font->height, calendar->style->text_color);
+		}
+
+		label_render_onto(bmp, calendar->font, fg, buff, xpos, ypos);
+		xpos += (3 - spaces) * calendar->font->width;
+		if (xpos == (xstart + width)) {
+			xpos = xstart;
+			ypos += calendar->font->height;
+		}
+	}
+}
+
+extern void
+calendar_free(calendar_t *calendar) {
+	free(calendar);
 }

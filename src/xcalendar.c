@@ -19,14 +19,27 @@
 #include <string.h>
 
 #include "base/font.h"
+#include "base/dateinfo.h"
 #include "ui/calendar.h"
 #include "util/debug.h"
+#include "x11/keys.h"
 #include "x11/window.h"
+
+static window_t *window;
 
 static bool
 match_opt(const char *in, const char *sh, const char *lo) {
 	return (strcmp(in, sh) == 0) ||
 		   (strcmp(in, lo) == 0);
+}
+
+static void
+key_press_callback(u32 key) {
+	switch (key) {
+		case KEY_ESCAPE:
+			window_loop_end(window);
+			return;
+	}
 }
 
 static void
@@ -65,15 +78,19 @@ main(int argc, char **argv) {
 	}
 
 	font_t *font;
+	dateinfo_t dateinfo;
+	calendar_style_t style;
 	calendar_t *calendar;
-	window_t *window;
 
+	window = window_create("xcalendar", "xcalendar");
 	font = font_load("Iosevka", 40);
-	calendar = calendar_from_today(font, 0xffffff, 0x000000);
-	window = window_init("xcalendar", "xcalendar", 0x000000);
+	dateinfo = dateinfo_from_today();
+	style = calendar_style_from(0xffffff, 0x000000);
+	calendar = calendar_create(font, &dateinfo, &style);
 
-	window_create_image(window, calendar->bitmap);
-	window_loop(window);
+	calendar_render_onto(calendar, window->bmp);
+	window_set_key_press_callback(window, key_press_callback);
+	window_loop_start(window);
 
 	font_unload(font);
 	calendar_free(calendar);
