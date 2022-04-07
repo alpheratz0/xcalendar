@@ -35,6 +35,51 @@ calendar_create(font_t *font, dateinfo_t *dateinfo, calendar_style_t *style) {
 }
 
 extern void
+calendar_goto_next_month(calendar_t *calendar) {
+	u32 month, year;
+	dateinfo_t *dinfo;
+	dinfo = calendar->dateinfo;
+	month = dinfo->month == 11 ? 0 : dinfo->month + 1;
+	year = dinfo->month == 11 ? dinfo->year + 1 : dinfo->year;
+	*(calendar->dateinfo) = dateinfo_from(month, year);
+}
+
+extern void
+calendar_goto_previous_month(calendar_t *calendar) {
+	u32 month, year;
+	dateinfo_t *dinfo;
+	dinfo = calendar->dateinfo;
+
+	if (!(dinfo->month == 0 && dinfo->year == 1753)) {
+		month = dinfo->month == 0 ? 11 : dinfo->month - 1;
+		year = dinfo->month == 0 ? dinfo->year - 1 : dinfo->year;
+		*(calendar->dateinfo) = dateinfo_from(month, year);
+	}
+}
+
+extern void
+calendar_goto_next_year(calendar_t *calendar) {
+	dateinfo_t *dinfo;
+	dinfo = calendar->dateinfo;
+	*(calendar->dateinfo) = dateinfo_from(dinfo->month, dinfo->year + 1);
+}
+
+extern void
+calendar_goto_previous_year(calendar_t *calendar) {
+	dateinfo_t *dinfo;
+	dinfo = calendar->dateinfo;
+
+	if (dinfo->year != 1753) {
+		*(calendar->dateinfo) = dateinfo_from(dinfo->month, dinfo->year - 1);
+	}
+}
+
+extern void
+calendar_goto_current_month(calendar_t *calendar) {
+	*(calendar->dateinfo) = dateinfo_from(0, 0);
+}
+
+extern void
 calendar_render_onto(calendar_t *calendar, bitmap_t *bmp) {
 	char buff[3];
 	u32 width = calendar->font->width * 21;

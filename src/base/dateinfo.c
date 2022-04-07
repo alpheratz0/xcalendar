@@ -26,7 +26,7 @@ dateinfo_from(u32 month, u32 year) {
 	}
 
 	if (year != 0) {
-		now->tm_year = year - 1900;
+		now->tm_year = (i32)(year) - 1900;
 		now->tm_mon = month;
 		now->tm_mday = 1;
 		mktime(now);

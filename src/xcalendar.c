@@ -27,7 +27,6 @@
 
 static window_t *window;
 static calendar_t *calendar;
-static dateinfo_t dateinfo;
 
 static bool
 match_opt(const char *in, const char *sh, const char *lo) {
@@ -42,27 +41,24 @@ key_press_callback(u32 key) {
 			window_loop_end(window);
 			return;
 		case KEY_H:
-			if (dateinfo.month == 0) dateinfo = dateinfo_from(11, dateinfo.year - 1);
-			else dateinfo = dateinfo_from(dateinfo.month - 1, dateinfo.year);
+			calendar_goto_previous_month(calendar);
 			break;
 		case KEY_L:
-			if (dateinfo.month == 11) dateinfo = dateinfo_from(0, dateinfo.year + 1);
-			else dateinfo = dateinfo_from(dateinfo.month + 1, dateinfo.year);
+			calendar_goto_next_month(calendar);
 			break;
 		case KEY_J:
-			dateinfo = dateinfo_from(dateinfo.month, dateinfo.year - 1);
+			calendar_goto_previous_year(calendar);
 			break;
 		case KEY_K:
-			dateinfo = dateinfo_from(dateinfo.month, dateinfo.year + 1);
+			calendar_goto_next_year(calendar);
 			break;
 		case KEY_C:
-			dateinfo = dateinfo_from(0, 0);
+			calendar_goto_current_month(calendar);
 			break;
 		default:
 			return;
 	}
 
-	calendar->dateinfo = &dateinfo;
 	bitmap_clear(window->bmp, 0x000000);
 	calendar_render_onto(calendar, window->bmp);
 	window_force_redraw(window);
@@ -107,6 +103,7 @@ main(int argc, char **argv) {
 	}
 
 	font_t *font;
+	dateinfo_t dateinfo;
 	calendar_style_t style;
 
 	window = window_create("xcalendar", "xcalendar");

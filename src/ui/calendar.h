@@ -27,6 +27,21 @@ extern calendar_t *
 calendar_create(font_t *font, dateinfo_t *dateinfo, calendar_style_t *style);
 
 extern void
+calendar_goto_next_month(calendar_t *calendar);
+
+extern void
+calendar_goto_previous_month(calendar_t *calendar);
+
+extern void
+calendar_goto_next_year(calendar_t *calendar);
+
+extern void
+calendar_goto_previous_year(calendar_t *calendar);
+
+extern void
+calendar_goto_current_month(calendar_t *calendar);
+
+extern void
 calendar_render_onto(calendar_t *calendar, bitmap_t *bmp);
 
 extern void
