@@ -1,5 +1,5 @@
-#ifndef __XCALENDAR_NUMDEF_H__
-#define __XCALENDAR_NUMDEF_H__
+#ifndef __XCALENDAR_UTIL_NUMDEF_H__
+#define __XCALENDAR_UTIL_NUMDEF_H__
 
 #include <stdint.h>
 

@@ -1,5 +1,5 @@
-#ifndef __XCALENDAR_DEBUG_H__
-#define __XCALENDAR_DEBUG_H__
+#ifndef __XCALENDAR_UTIL_DEBUG_H__
+#define __XCALENDAR_UTIL_DEBUG_H__
 
 extern void
 die(const char *err);

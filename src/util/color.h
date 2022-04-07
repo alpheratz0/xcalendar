@@ -1,5 +1,5 @@
-#ifndef __XCALENDAR_COLOR_H__
-#define __XCALENDAR_COLOR_H__
+#ifndef __XCALENDAR_UTIL_COLOR_H__
+#define __XCALENDAR_UTIL_COLOR_H__
 
 #include "numdef.h"
 
