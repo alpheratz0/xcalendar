@@ -15,6 +15,6 @@ struct dateinfo {
 };
 
 extern dateinfo_t
-dateinfo_from_today(void);
+dateinfo_from(u32 month, u32 year);
 
 #endif

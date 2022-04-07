@@ -26,6 +26,8 @@
 #include "x11/window.h"
 
 static window_t *window;
+static calendar_t *calendar;
+static dateinfo_t dateinfo;
 
 static bool
 match_opt(const char *in, const char *sh, const char *lo) {
@@ -39,7 +41,28 @@ key_press_callback(u32 key) {
 		case KEY_ESCAPE:
 			window_loop_end(window);
 			return;
+		case KEY_H:
+			if (dateinfo.month == 0) dateinfo = dateinfo_from(11, dateinfo.year - 1);
+			else dateinfo = dateinfo_from(dateinfo.month - 1, dateinfo.year);
+			break;
+		case KEY_L:
+			if (dateinfo.month == 11) dateinfo = dateinfo_from(0, dateinfo.year + 1);
+			else dateinfo = dateinfo_from(dateinfo.month + 1, dateinfo.year);
+			break;
+		case KEY_J:
+			dateinfo = dateinfo_from(dateinfo.month, dateinfo.year - 1);
+			break;
+		case KEY_K:
+			dateinfo = dateinfo_from(dateinfo.month, dateinfo.year + 1);
+			break;
+		default:
+			return;
 	}
+
+	calendar->dateinfo = &dateinfo;
+	bitmap_rect(window->bmp, 0, 0, window->bmp->width, window->bmp->height, 0);
+	calendar_render_onto(calendar, window->bmp);
+	window_force_redraw(window);
 }
 
 static void
@@ -55,6 +78,8 @@ usage(void) {
 static void
 keybindings(void) {
 	puts("Keybindings are:");
+	puts("h/l: see the previous/next month");
+	puts("j/k: see the previous/next year");
 	puts("esc: exit");
 	exit(0);
 }
@@ -78,13 +103,11 @@ main(int argc, char **argv) {
 	}
 
 	font_t *font;
-	dateinfo_t dateinfo;
 	calendar_style_t style;
-	calendar_t *calendar;
 
 	window = window_create("xcalendar", "xcalendar");
 	font = font_load("Iosevka", 40);
-	dateinfo = dateinfo_from_today();
+	dateinfo = dateinfo_from(0, 0);
 	style = calendar_style_from(0xffffff, 0x000000);
 	calendar = calendar_create(font, &dateinfo, &style);
 

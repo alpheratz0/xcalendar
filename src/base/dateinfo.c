@@ -9,31 +9,50 @@ static const char *mnames[] = {
 };
 
 extern dateinfo_t
-dateinfo_from_today(void) {
+dateinfo_from(u32 month, u32 year) {
 	time_t ts = time(NULL);
 	struct tm *now = localtime(&ts);
-	dateinfo_t di_today = { 0 };
+	dateinfo_t di = { 0 };
 
-	di_today.day = now->tm_mday;
-	di_today.month = now->tm_mon;
-	di_today.year = now->tm_year + 1900;
-	di_today.firstday_weekday = ((now->tm_wday - now->tm_mday) % 7 + 8) % 7;
+	if (year == 0 || ((now->tm_year + 1900) == (i32)(year) && now->tm_mon == (i32)(month))) {
+		di.day = now->tm_mday;
+		di.month = now->tm_mon;
+		di.year = now->tm_year + 1900;
+	}
+	else {
+		di.day = 0;
+		di.month = month;
+		di.year = year;
+	}
 
-	strcpy(di_today.month_name, mnames[di_today.month]);
+	if (year != 0) {
+		now->tm_year = year - 1900;
+		now->tm_mon = month;
+		now->tm_mday = 1;
+		mktime(now);
+	}
 
-	switch (di_today.month) {
-		case 0: case 2: case 4: case 6: case 7: case 9: case 11:
-			di_today.num_days_in_month = 31;
+	di.firstday_weekday = ((now->tm_wday - now->tm_mday) % 7 + 8) % 7;
+
+	strcpy(di.month_name, mnames[di.month]);
+
+	switch (di.month) {
+		case 0: case 2:
+		case 4: case 6:
+		case 7: case 9:
+		case 11:
+			di.num_days_in_month = 31;
 			break;
-		case 3: case 5: case 8: case 10:
-			di_today.num_days_in_month = 30;
+		case 3: case 5:
+		case 8: case 10:
+			di.num_days_in_month = 30;
 			break;
 		case 1:
-			di_today.num_days_in_month = 28;
-			di_today.num_days_in_month += (di_today.year % 400 == 0 ||
-					(di_today.year % 4 == 0 && di_today.year % 100 != 0));
+			di.num_days_in_month = 28;
+			di.num_days_in_month += (di.year % 400 == 0 ||
+					(di.year % 4 == 0 && di.year % 100 != 0));
 			break;
 	}
 
-	return di_today;
+	return di;
 }

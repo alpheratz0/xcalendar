@@ -44,11 +44,13 @@ calendar_render_onto(calendar_t *calendar, bitmap_t *bmp) {
 	u32 xstart = (bmp->width - width) / 2;
 	u32 ystart = (bmp->height - height) / 2;
 
-	/* render month name */
-	xpos = xstart + (width - (strlen(calendar->dateinfo->month_name) - 1) * calendar->font->width) / 2;
+	/* render month name and year */
+	char year_and_month[30];
+	snprintf(year_and_month, sizeof(year_and_month), "%s, %d", calendar->dateinfo->month_name, calendar->dateinfo->year);
+	xpos = xstart + (width - (strlen(year_and_month) - 1) * calendar->font->width) / 2;
 	ypos = ystart;
 
-	label_render_onto(bmp, calendar->font, calendar->style->text_color, calendar->dateinfo->month_name, xpos, ypos);
+	label_render_onto(bmp, calendar->font, calendar->style->text_color, year_and_month, xpos, ypos);
 	ypos += calendar->font->height;
 
 	/* render day names */
