@@ -55,6 +55,9 @@ key_press_callback(u32 key) {
 		case KEY_K:
 			dateinfo = dateinfo_from(dateinfo.month, dateinfo.year + 1);
 			break;
+		case KEY_C:
+			dateinfo = dateinfo_from(0, 0);
+			break;
 		default:
 			return;
 	}
@@ -80,6 +83,7 @@ keybindings(void) {
 	puts("Keybindings are:");
 	puts("h/l: see the previous/next month");
 	puts("j/k: see the previous/next year");
+	puts("c: see the current month");
 	puts("esc: exit");
 	exit(0);
 }
