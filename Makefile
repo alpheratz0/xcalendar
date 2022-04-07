@@ -12,7 +12,7 @@ SRC = src/base/bitmap.c \
 	  src/base/dateinfo.c \
 	  src/xcalendar.c \
 	  src/ui/calendar.c \
-	  src/ui/text.c \
+	  src/ui/label.c \
 	  src/x11/window.c \
 	  src/util/color.c \
 	  src/util/debug.c
@@ -25,7 +25,7 @@ ${OBJ}: src/base/font.h \
 		src/base/dateinfo.h \
 		src/base/bitmap.h \
 		src/ui/calendar.h \
-		src/ui/text.h \
+		src/ui/label.h \
 		src/x11/window.h \
 		src/util/debug.h \
 		src/util/color.h \

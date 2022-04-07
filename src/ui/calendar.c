@@ -6,7 +6,7 @@
 #include "../base/dateinfo.h"
 #include "../util/numdef.h"
 #include "../util/debug.h"
-#include "text.h"
+#include "label.h"
 #include "calendar.h"
 
 extern calendar_t *
@@ -30,12 +30,12 @@ calendar_from_today(font_t *ft, u32 foreground, u32 background) {
 
 	/* render month name */
 	xpos = (width - (strlen(di.month_name) - 1) * ft->width) / 2;
-	text_render(cal->bitmap, ft, xpos, ypos, foreground, background, di.month_name);
+	label_render_onto(cal->bitmap, ft, foreground, di.month_name, xpos, ypos);
 	ypos += ft->height;
 
 	/* render day names */
 	xpos = 0;
-	text_render(cal->bitmap, ft, xpos, ypos, foreground, background, " Su Mo Tu We Th Fr Sa");
+	label_render_onto(cal->bitmap, ft, foreground, " Su Mo Tu We Th Fr Sa", xpos, ypos);
 	ypos += ft->height;
 
 	/* render day numbers */
@@ -44,10 +44,14 @@ calendar_from_today(font_t *ft, u32 foreground, u32 background) {
 	for (u32 day = 1; day <= di.num_days_in_month; ++day) {
 		u8 spaces = day > 9 ? 1 : 2;
 		u32 fg = day == di.day ? background : foreground;
-		u32 bg = day == di.day ? foreground : background;
 		xpos += spaces * ft->width;
 		snprintf(buff, 3, "%d", day);
-		text_render(cal->bitmap, ft, xpos, ypos, fg, bg, buff);
+
+		if (di.day == day) {
+			bitmap_rect(cal->bitmap, xpos, ypos, ft->width * (3 - spaces), ft->height, foreground);
+		}
+
+		label_render_onto(cal->bitmap, ft, fg, buff, xpos, ypos);
 		xpos += (3 - spaces) * ft->width;
 		if (xpos == cal->bitmap->width) {
 			xpos = 0;

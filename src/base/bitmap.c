@@ -36,6 +36,14 @@ bitmap_set_unsafe(bitmap_t *bmp, u32 x, u32 y, u32 color) {
 	bmp->px[y*bmp->width+x] = color;
 }
 
+extern u32
+bitmap_get(bitmap_t *bmp, u32 x, u32 y) {
+	if (x < bmp->width && y < bmp->height) {
+		return bmp->px[y*bmp->width+x];
+	}
+	return 0;
+}
+
 extern void
 bitmap_rect(bitmap_t *bmp, u32 x, u32 y, u32 width, u32 height, u32 color) {
 	for (u32 i = 0; i < width; ++i) {

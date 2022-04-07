@@ -2,7 +2,7 @@
 #include "color.h"
 
 extern u32
-clerp(u32 from, u32 to, u8 v) {
+color_lerp(u32 from, u32 to, u8 v) {
 	u8 rfrom = (from >> 16) & 0xff;
 	u8 rto   = (to >> 16) & 0xff;
 	u8 r     = rfrom + ((rto - rfrom) * v) / 0xff;

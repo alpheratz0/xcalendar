@@ -4,6 +4,6 @@
 #include "numdef.h"
 
 extern u32
-clerp(u32 from, u32 to, u8 v);
+color_lerp(u32 from, u32 to, u8 v);
 
 #endif
