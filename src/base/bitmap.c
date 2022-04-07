@@ -31,11 +31,6 @@ bitmap_set(bitmap_t *bmp, u32 x, u32 y, u32 color) {
 	}
 }
 
-extern void
-bitmap_set_unsafe(bitmap_t *bmp, u32 x, u32 y, u32 color) {
-	bmp->px[y*bmp->width+x] = color;
-}
-
 extern u32
 bitmap_get(bitmap_t *bmp, u32 x, u32 y) {
 	if (x < bmp->width && y < bmp->height) {
