@@ -91,7 +91,7 @@ calendar_render_onto(calendar_t *calendar, bitmap_t *bmp) {
 
 	/* render month name and year */
 	char year_and_month[30];
-	snprintf(year_and_month, sizeof(year_and_month), "%s, %d", calendar->dateinfo->month_name, calendar->dateinfo->year);
+	snprintf(year_and_month, sizeof(year_and_month), "%-14s%6d", calendar->dateinfo->month_name, calendar->dateinfo->year);
 	xpos = xstart + (width - (strlen(year_and_month) - 1) * calendar->font->width) / 2;
 	ypos = ystart;
 
