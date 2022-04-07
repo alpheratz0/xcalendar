@@ -4,8 +4,10 @@
 #include "dateinfo.h"
 
 static const char *mnames[] = {
-	"January", "February", "March", "April", "May", "June", "July", "August",
-	"September", "October", "November", "December"
+	"Jan", "Feb", "Mar",
+	"Apr", "May", "Jun",
+	"Jul", "Aug", "Sep",
+	"Oct", "Nov", "Dec"
 };
 
 extern dateinfo_t
