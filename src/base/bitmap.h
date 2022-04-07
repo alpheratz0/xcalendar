@@ -24,6 +24,9 @@ extern void
 bitmap_rect(bitmap_t *bmp, u32 x, u32 y, u32 width, u32 height, u32 color);
 
 extern void
+bitmap_clear(bitmap_t *bmp, u32 color);
+
+extern void
 bitmap_free(bitmap_t *bmp);
 
 #endif

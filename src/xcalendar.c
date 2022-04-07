@@ -63,7 +63,7 @@ key_press_callback(u32 key) {
 	}
 
 	calendar->dateinfo = &dateinfo;
-	bitmap_rect(window->bmp, 0, 0, window->bmp->width, window->bmp->height, 0);
+	bitmap_clear(window->bmp, 0x000000);
 	calendar_render_onto(calendar, window->bmp);
 	window_force_redraw(window);
 }
