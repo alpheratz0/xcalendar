@@ -10,7 +10,7 @@ typedef struct calendar_style calendar_style_t;
 
 struct calendar_style {
 	u32 text_color;
-	u32 current_day_background_color;
+	u32 background_color;
 };
 
 struct calendar {
@@ -21,7 +21,7 @@ struct calendar {
 };
 
 extern calendar_style_t
-calendar_style_from(u32 text_color, u32 current_day_background_color);
+calendar_style_from(u32 text_color, u32 background_color);
 
 extern calendar_t *
 calendar_create(font_t *font, calendar_style_t *style);

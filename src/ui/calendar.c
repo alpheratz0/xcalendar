@@ -24,10 +24,10 @@ static const i32 month_numdays[] = {
 };
 
 extern calendar_style_t
-calendar_style_from(u32 text_color, u32 current_day_background_color) {
+calendar_style_from(u32 text_color, u32 background_color) {
 	calendar_style_t style;
 	style.text_color = text_color;
-	style.current_day_background_color = current_day_background_color;
+	style.background_color = background_color;
 	return style;
 }
 
@@ -128,6 +128,8 @@ calendar_render_onto(calendar_t *calendar, bitmap_t *bmp) {
 	xpos = xstart = (bmp->width - width) / 2;
 	ypos = (bmp->height - height) / 2;
 
+	bitmap_clear(bmp, calendar->style->background_color);
+
 	snprintf(buff, sizeof(buff), "%10s %-10d", calendar_get_month_name(calendar->month), calendar->year);
 	label_render_onto(bmp, calendar->font, calendar->style->text_color, buff, xpos, ypos);
 	ypos += calendar->font->height;
@@ -140,16 +142,18 @@ calendar_render_onto(calendar_t *calendar, bitmap_t *bmp) {
 	for (i32 day = 0; day < calendar_get_month_days(calendar->month, calendar->year); ++day) {
 		i32 spaces = day >= 9 ? 1 : 2;
 		i32 is_today = current.tm_year == now.tm_year && current.tm_mon == now.tm_mon && (day + 1) == now.tm_mday;
-		i32 foreground = is_today ?  calendar->style->current_day_background_color : calendar->style->text_color;
 
 		xpos += spaces * calendar->font->width;
 		snprintf(buff, sizeof(buff), "%d", day + 1);
 
 		if (is_today) {
 			bitmap_rect(bmp, xpos, ypos, calendar->font->width * (3 - spaces), calendar->font->height, calendar->style->text_color);
+			label_render_onto(bmp, calendar->font, calendar->style->background_color, buff, xpos, ypos);
+		}
+		else {
+			label_render_onto(bmp, calendar->font, calendar->style->text_color, buff, xpos, ypos);
 		}
 
-		label_render_onto(bmp, calendar->font, foreground, buff, xpos, ypos);
 		xpos += (3 - spaces) * calendar->font->width;
 
 		if (xpos == (xstart + width)) {
