@@ -37,6 +37,7 @@ static void
 key_press_callback(u32 key) {
 	switch (key) {
 		case KEY_ESCAPE:
+		case KEY_Q:
 			window_loop_end(window);
 			return;
 		case KEY_H:
@@ -78,7 +79,7 @@ keybindings(void) {
 	puts("h/l: see the previous/next month");
 	puts("j/k: see the previous/next year");
 	puts("c: see the current month");
-	puts("esc: exit");
+	puts("q/esc: exit");
 	exit(0);
 }
 
