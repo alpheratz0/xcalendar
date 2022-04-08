@@ -3,7 +3,6 @@
 
 #include "../base/font.h"
 #include "../base/bitmap.h"
-#include "../base/dateinfo.h"
 #include "../util/numdef.h"
 
 typedef struct calendar calendar_t;
@@ -16,15 +15,16 @@ struct calendar_style {
 
 struct calendar {
 	font_t *font;
-	dateinfo_t *dateinfo;
 	calendar_style_t *style;
+	i32 month;
+	i32 year;
 };
 
 extern calendar_style_t
 calendar_style_from(u32 text_color, u32 current_day_background_color);
 
 extern calendar_t *
-calendar_create(font_t *font, dateinfo_t *dateinfo, calendar_style_t *style);
+calendar_create(font_t *font, calendar_style_t *style);
 
 extern void
 calendar_goto_next_month(calendar_t *calendar);

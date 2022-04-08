@@ -1,4 +1,4 @@
-VERSION = 0.3.4
+VERSION = 0.3.6
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
 LDLIBS = -lxcb -lfreetype -lxcb-image -lfontconfig
@@ -9,7 +9,6 @@ CC = cc
 
 SRC = src/base/bitmap.c \
 	  src/base/font.c \
-	  src/base/dateinfo.c \
 	  src/xcalendar.c \
 	  src/ui/calendar.c \
 	  src/ui/label.c \
@@ -22,7 +21,6 @@ OBJ = ${SRC:.c=.o}
 all: xcalendar
 
 ${OBJ}: src/base/font.h \
-		src/base/dateinfo.h \
 		src/base/bitmap.h \
 		src/ui/calendar.h \
 		src/ui/label.h \

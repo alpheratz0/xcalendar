@@ -19,7 +19,6 @@
 #include <string.h>
 
 #include "base/font.h"
-#include "base/dateinfo.h"
 #include "ui/calendar.h"
 #include "util/debug.h"
 #include "x11/keys.h"
@@ -103,14 +102,12 @@ main(int argc, char **argv) {
 	}
 
 	font_t *font;
-	dateinfo_t dateinfo;
 	calendar_style_t style;
 
 	window = window_create("xcalendar", "xcalendar");
 	font = font_load("Iosevka", 40);
-	dateinfo = dateinfo_from(0, 0);
 	style = calendar_style_from(0xffffff, 0x000000);
-	calendar = calendar_create(font, &dateinfo, &style);
+	calendar = calendar_create(font, &style);
 
 	calendar_render_onto(calendar, window->bmp);
 	window_set_key_press_callback(window, key_press_callback);
