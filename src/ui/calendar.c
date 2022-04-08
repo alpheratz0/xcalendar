@@ -23,6 +23,25 @@ static const i32 month_numdays[] = {
 	31, 30, 31
 };
 
+static const char *
+calendar_get_month_name(i32 month) {
+	return month_names[month];
+}
+
+static i32
+calendar_get_month_days(i32 month, i32 year) {
+	i32 numdays;
+	numdays = month_numdays[month];
+
+	if (month == 1) {
+		if (year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)) {
+			++numdays;
+		}
+	}
+
+	return numdays;
+}
+
 extern calendar_style_t
 calendar_style_from(u32 text_color, u32 background_color) {
 	calendar_style_t style;
@@ -85,25 +104,6 @@ calendar_goto_current_month(calendar_t *calendar) {
 	tm = localtime((const time_t [1]) { time(NULL) });
 	calendar->year = tm->tm_year + 1900;
 	calendar->month = tm->tm_mon;
-}
-
-static const char *
-calendar_get_month_name(i32 month) {
-	return month_names[month];
-}
-
-static i32
-calendar_get_month_days(i32 month, i32 year) {
-	i32 numdays;
-	numdays = month_numdays[month];
-
-	if (month == 1) {
-		if (year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)) {
-			++numdays;
-		}
-	}
-
-	return numdays;
 }
 
 extern void
