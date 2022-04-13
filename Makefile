@@ -1,4 +1,4 @@
-VERSION = 0.3.10
+VERSION = 0.3.11
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
 LDLIBS = -lxcb -lfreetype -lxcb-image -lfontconfig
