@@ -51,6 +51,7 @@
 #include "base/font.h"
 #include "ui/calendar.h"
 #include "util/debug.h"
+#include "util/numdef.h"
 #include "x11/keys.h"
 #include "x11/window.h"
 
