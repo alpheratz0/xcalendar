@@ -79,7 +79,7 @@ extern void
 calendar_goto_previous_month(calendar_t *calendar) {
 	if (--calendar->month == -1) {
 		calendar->month = 11;
-		if(--calendar->year == 1752) {
+		if (--calendar->year == 1752) {
 			calendar->year = 1753;
 			calendar->month = 0;
 		}
