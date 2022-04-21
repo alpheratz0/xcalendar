@@ -101,7 +101,7 @@ calendar_goto_previous_year(calendar_t *calendar) {
 extern void
 calendar_goto_current_month(calendar_t *calendar) {
 	struct tm *tm;
-	tm = localtime((const time_t [1]) { time(NULL) });
+	tm = localtime((const time_t[1]) { time(NULL) });
 	calendar->year = tm->tm_year + 1900;
 	calendar->month = tm->tm_mon;
 }
@@ -113,8 +113,8 @@ calendar_render_onto(calendar_t *calendar, bitmap_t *bmp) {
 	u32 xstart, xpos, ypos;
 	char buff[50];
 
-	now = *(localtime((const time_t [1]) { time(NULL) }));
-	current = *(localtime((const time_t [1]) { time(NULL) }));
+	now = *(localtime((const time_t[1]) { time(NULL) }));
+	current = *(localtime((const time_t[1]) { time(NULL) }));
 
 	current.tm_year = calendar->year - 1900;
 	current.tm_mon	= calendar->month;
