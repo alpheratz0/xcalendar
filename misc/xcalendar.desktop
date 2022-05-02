@@ -1,8 +1,9 @@
 [Desktop Entry]
-Categories=Utility;
+Categories=Utility;Calendar;
 Type=Application
 TryExec=xcalendar
 Exec=xcalendar
+GenericName=Calendar
 Name=xcalendar
 Comment=simple calendar application
 Terminal=false
