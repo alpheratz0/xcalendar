@@ -1,6 +1,7 @@
 VERSION = 0.3.13
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
+APPPREFIX = ${PREFIX}/share/applications
 LDLIBS = -lxcb -lfreetype -lxcb-image -lfontconfig
 LDFLAGS = -s ${LDLIBS}
 INCS = -I/usr/include -I/usr/include/freetype2
@@ -40,6 +41,8 @@ install: all
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	@cp -f man/xcalendar.1 ${DESTDIR}${MANPREFIX}/man1
 	@chmod 644 ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
+	@cp -f misc/xcalendar.desktop ${DESTDIR}${APPPREFIX}/xcalendar.desktop
+	@chmod 644 ${DESTDIR}${APPPREFIX}/xcalendar.desktop
 
 dist: clean
 	@mkdir -p xcalendar-${VERSION}
@@ -51,6 +54,7 @@ dist: clean
 uninstall:
 	@rm -f ${DESTDIR}${PREFIX}/bin/xcalendar
 	@rm -f ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
+	@rm -f ${DESTDIR}${APPPREFIX}/xcalendar.desktop
 
 clean:
 	@rm -f xcalendar xcalendar-${VERSION}.tar.gz ${OBJ}

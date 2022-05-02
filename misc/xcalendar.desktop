@@ -1,0 +1,9 @@
+[Desktop Entry]
+Categories=Utility;
+Type=Application
+TryExec=xcalendar
+Exec=xcalendar
+Name=xcalendar
+Comment=simple calendar application
+Terminal=false
+StartupWMClass=xcalendar
