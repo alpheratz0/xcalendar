@@ -47,7 +47,7 @@ install: all
 
 dist: clean
 	@mkdir -p xcalendar-${VERSION}
-	@cp -R LICENSE Makefile README man src xcalendar-${VERSION}
+	@cp -R LICENSE Makefile README misc man src xcalendar-${VERSION}
 	@tar -cf xcalendar-${VERSION}.tar xcalendar-${VERSION}
 	@gzip xcalendar-${VERSION}.tar
 	@rm -rf xcalendar-${VERSION}
