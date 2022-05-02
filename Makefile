@@ -41,6 +41,7 @@ install: all
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	@cp -f man/xcalendar.1 ${DESTDIR}${MANPREFIX}/man1
 	@chmod 644 ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
+	@mkdir -p ${DESTDIR}${APPPREFIX}
 	@cp -f misc/xcalendar.desktop ${DESTDIR}${APPPREFIX}/xcalendar.desktop
 	@chmod 644 ${DESTDIR}${APPPREFIX}/xcalendar.desktop
 
