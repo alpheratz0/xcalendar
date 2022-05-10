@@ -111,6 +111,7 @@ calendar_render_onto(calendar_t *calendar, bitmap_t *bmp) {
 	struct tm now, current;
 	u32 width, height;
 	u32 xstart, xpos, ypos;
+	i32 numdays;
 	char buff[50];
 
 	now = *(localtime((const time_t[1]) { time(NULL) }));
@@ -139,7 +140,9 @@ calendar_render_onto(calendar_t *calendar, bitmap_t *bmp) {
 
 	xpos = xstart + calendar->font->width * current.tm_wday * 3;
 
-	for (i32 day = 0; day < calendar_get_month_days(calendar->month, calendar->year); ++day) {
+	numdays = calendar_get_month_days(calendar->month, calendar->year);
+
+	for (i32 day = 0; day < numdays; ++day) {
 		i32 spaces = day >= 9 ? 1 : 2;
 		i32 is_today = current.tm_year == now.tm_year && current.tm_mon == now.tm_mon && (day + 1) == now.tm_mday;
 

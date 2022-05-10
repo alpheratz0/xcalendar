@@ -1,4 +1,4 @@
-VERSION = 0.3.13
+VERSION = 0.3.14
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
 APPPREFIX = ${PREFIX}/share/applications
