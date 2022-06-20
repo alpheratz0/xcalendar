@@ -59,13 +59,15 @@ static window_t *window;
 static calendar_t *calendar;
 
 static bool
-match_opt(const char *in, const char *sh, const char *lo) {
+match_opt(const char *in, const char *sh, const char *lo)
+{
 	return (strcmp(in, sh) == 0) ||
 		   (strcmp(in, lo) == 0);
 }
 
 static void
-key_press_callback(u32 key) {
+key_press_callback(u32 key)
+{
 	switch (key) {
 		case KEY_ESCAPE:
 		case KEY_Q:
@@ -95,7 +97,8 @@ key_press_callback(u32 key) {
 }
 
 static void
-usage(void) {
+usage(void)
+{
 	puts("Usage: xcalendar [ -hkv ]");
 	puts("Options are:");
 	puts("     -h | --help                    display this message and exit");
@@ -105,7 +108,8 @@ usage(void) {
 }
 
 static void
-keybindings(void) {
+keybindings(void)
+{
 	puts("Keybindings are:");
 	puts("h/l: see the previous/next month");
 	puts("j/k: see the previous/next year");
@@ -115,14 +119,15 @@ keybindings(void) {
 }
 
 static void
-version(void) {
+version(void)
+{
 	puts("xcalendar version "VERSION);
 	exit(0);
 }
 
 int
-main(int argc, char **argv) {
-
+main(int argc, char **argv)
+{
 	if (++argv, --argc > 0) {
 		if (match_opt(*argv, "-k", "--keybindings")) keybindings();
 		else if (match_opt(*argv, "-h", "--help")) usage();

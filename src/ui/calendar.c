@@ -41,12 +41,14 @@ static const i32 month_numdays[] = {
 };
 
 static const char *
-calendar_get_month_name(i32 month) {
+calendar_get_month_name(i32 month)
+{
 	return month_names[month];
 }
 
 static i32
-calendar_get_month_days(i32 month, i32 year) {
+calendar_get_month_days(i32 month, i32 year)
+{
 	i32 numdays;
 	numdays = month_numdays[month];
 
@@ -60,7 +62,8 @@ calendar_get_month_days(i32 month, i32 year) {
 }
 
 extern calendar_style_t
-calendar_style_from(u32 text_color, u32 background_color) {
+calendar_style_from(u32 text_color, u32 background_color)
+{
 	calendar_style_t style;
 	style.text_color = text_color;
 	style.background_color = background_color;
@@ -68,7 +71,8 @@ calendar_style_from(u32 text_color, u32 background_color) {
 }
 
 extern calendar_t *
-calendar_create(font_t *font, calendar_style_t *style) {
+calendar_create(font_t *font, calendar_style_t *style)
+{
 	calendar_t *calendar;
 
 	if ((calendar = malloc(sizeof(calendar_t)))) {
@@ -85,7 +89,8 @@ calendar_create(font_t *font, calendar_style_t *style) {
 }
 
 extern void
-calendar_goto_next_month(calendar_t *calendar) {
+calendar_goto_next_month(calendar_t *calendar)
+{
 	if (++calendar->month == 12) {
 		calendar->month = 0;
 		++calendar->year;
@@ -93,7 +98,8 @@ calendar_goto_next_month(calendar_t *calendar) {
 }
 
 extern void
-calendar_goto_previous_month(calendar_t *calendar) {
+calendar_goto_previous_month(calendar_t *calendar)
+{
 	if (--calendar->month == -1) {
 		calendar->month = 11;
 		if (--calendar->year == 1752) {
@@ -104,19 +110,22 @@ calendar_goto_previous_month(calendar_t *calendar) {
 }
 
 extern void
-calendar_goto_next_year(calendar_t *calendar) {
+calendar_goto_next_year(calendar_t *calendar)
+{
 	++calendar->year;
 }
 
 extern void
-calendar_goto_previous_year(calendar_t *calendar) {
+calendar_goto_previous_year(calendar_t *calendar)
+{
 	if (--calendar->year == 1752) {
 		calendar->year = 1753;
 	}
 }
 
 extern void
-calendar_goto_current_month(calendar_t *calendar) {
+calendar_goto_current_month(calendar_t *calendar)
+{
 	struct tm *tm;
 	tm = localtime((const time_t[1]) { time(NULL) });
 	calendar->year = tm->tm_year + 1900;
