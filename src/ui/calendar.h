@@ -18,27 +18,28 @@
 #ifndef __XCALENDAR_UI_CALENDAR_H__
 #define __XCALENDAR_UI_CALENDAR_H__
 
+#include <stdint.h>
+
 #include "../base/font.h"
 #include "../base/bitmap.h"
-#include "../util/numdef.h"
 
 typedef struct calendar calendar_t;
 typedef struct calendar_style calendar_style_t;
 
 struct calendar_style {
-	u32 text_color;
-	u32 background_color;
+	uint32_t text_color;
+	uint32_t background_color;
 };
 
 struct calendar {
 	font_t *font;
 	calendar_style_t *style;
-	i32 month;
-	i32 year;
+	int32_t month;
+	int32_t year;
 };
 
 extern calendar_style_t
-calendar_style_from(u32 text_color, u32 background_color);
+calendar_style_from(uint32_t text_color, uint32_t background_color);
 
 extern calendar_t *
 calendar_create(font_t *font, calendar_style_t *style);
