@@ -45,13 +45,13 @@
 
 */
 
+#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 
 #include "base/font.h"
 #include "ui/calendar.h"
 #include "util/debug.h"
-#include "util/numdef.h"
 #include "x11/keys.h"
 #include "x11/window.h"
 
@@ -72,7 +72,7 @@ print_opt(const char *sh, const char *lo, const char *desc)
 }
 
 static void
-key_press_callback(u32 key)
+key_press_callback(uint32_t key)
 {
 	switch (key) {
 		case KEY_ESCAPE:
