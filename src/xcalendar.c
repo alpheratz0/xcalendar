@@ -134,6 +134,9 @@ version(void)
 int
 main(int argc, char **argv)
 {
+	font_t *font;
+	calendar_style_t style;
+
 	if (++argv, --argc > 0) {
 		if (match_opt(*argv, "-k", "--keybindings")) keybindings();
 		else if (match_opt(*argv, "-h", "--help")) usage();
@@ -141,9 +144,6 @@ main(int argc, char **argv)
 		else if (**argv == '-') dief("invalid option %s", *argv);
 		else dief("unexpected argument: %s", *argv);
 	}
-
-	font_t *font;
-	calendar_style_t style;
 
 	window = window_create("xcalendar", "xcalendar");
 	font = font_load("Iosevka", 40);
