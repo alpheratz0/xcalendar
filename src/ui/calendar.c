@@ -27,29 +27,41 @@
 #include "calendar.h"
 
 static const char *month_names[] = {
-	"Jan", "Feb", "Mar",
-	"Apr", "May", "Jun",
-	"Jul", "Aug", "Sep",
-	"Oct", "Nov", "Dec"
+	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
 
-static const int32_t month_numdays[] = {
-	31, 28, 31,
-	30, 31, 30,
-	31, 31, 30,
-	31, 30, 31
+static const int month_numdays[] = {
+	31, 28, 31, 30, 31, 30,
+	31, 31, 30, 31, 30, 31
 };
 
 static const char *
-calendar_get_month_name(int32_t month)
+calendar_get_month_name(int month)
 {
 	return month_names[month];
 }
 
-static int32_t
-calendar_get_month_days(int32_t month, int32_t year)
+static int
+calendar_get_month_offset(int month, int year) {
+	struct tm tm;
+
+	tm = localtime((const time_t []){ time(NULL) })[0];
+
+	tm.tm_year = year - 1900;
+	tm.tm_mon = month;
+	tm.tm_mday = 1;
+
+	mktime(&tm);
+
+	return tm.tm_wday;
+}
+
+static int
+calendar_get_month_days(int month, int year)
 {
-	int32_t numdays;
+	int numdays;
+
 	numdays = month_numdays[month];
 
 	if (month == 1) {
@@ -62,30 +74,31 @@ calendar_get_month_days(int32_t month, int32_t year)
 }
 
 extern calendar_style_t
-calendar_style_from(uint32_t text_color, uint32_t background_color)
+calendar_style_from(font_t *font, uint32_t foreground, uint32_t background)
 {
 	calendar_style_t style;
-	style.text_color = text_color;
-	style.background_color = background_color;
+
+	style.font = font;
+	style.foreground = foreground;
+	style.background = background;
+
 	return style;
 }
 
 extern calendar_t *
-calendar_create(font_t *font, calendar_style_t *style)
+calendar_create(calendar_style_t *style)
 {
 	calendar_t *calendar;
 
-	if ((calendar = malloc(sizeof(calendar_t)))) {
-		calendar->font = font;
-		calendar->style = style;
-		calendar_goto_current_month(calendar);
-
-		return calendar;
+	if (NULL == (calendar = malloc(sizeof(calendar_t)))) {
+		die("error while calling malloc, no memory available");
 	}
 
-	die("error while calling malloc, no memory available");
+	calendar->style = style;
 
-	return (void *)(0);
+	calendar_goto_current_month(calendar);
+
+	return calendar;
 }
 
 extern void
@@ -126,73 +139,101 @@ calendar_goto_previous_year(calendar_t *calendar)
 extern void
 calendar_goto_current_month(calendar_t *calendar)
 {
-	struct tm *tm;
-	tm = localtime((const time_t[1]) { time(NULL) });
-	calendar->year = tm->tm_year + 1900;
-	calendar->month = tm->tm_mon;
+	const struct tm *now;
+
+	now = localtime((const time_t[1]) { time(NULL) });
+	calendar->year = now->tm_year + 1900;
+	calendar->month = now->tm_mon;
 }
 
 extern void
-calendar_render_onto(calendar_t *calendar, bitmap_t *bmp) {
-	struct tm now, current;
-	uint32_t width, height;
-	uint32_t xstart, xpos, ypos;
-	int32_t numdays;
-	char buff[50];
+calendar_render_onto(calendar_t *calendar, bitmap_t *bmp)
+{
+	/* clear the bitmap */
+	bitmap_clear(bmp, calendar->style->background);
 
-	now = *(localtime((const time_t[1]) { time(NULL) }));
-	current = *(localtime((const time_t[1]) { time(NULL) }));
+	/* render month and year */
+	char month_and_year[32];
+	int month_and_year_pos_x, month_and_year_pos_y;
 
-	current.tm_year = calendar->year - 1900;
-	current.tm_mon	= calendar->month;
-	current.tm_mday = 1;
+	month_and_year_pos_x = (bmp->width - calendar->style->font->width * 21) / 2;
+	month_and_year_pos_y = (bmp->height - calendar->style->font->height * 7) / 2;
 
-	mktime(&current);
+	snprintf(
+		month_and_year, sizeof(month_and_year), "%10s %-10d",
+		calendar_get_month_name(calendar->month), calendar->year
+	);
 
-	width = calendar->font->width * 21;
-	height = calendar->font->height * 7;
+	label_render_onto(
+		month_and_year, calendar->style->font,
+		calendar->style->foreground, month_and_year_pos_x,
+		month_and_year_pos_y, bmp
+	);
 
-	xpos = xstart = (bmp->width - width) / 2;
-	ypos = (bmp->height - height) / 2;
+	/* render day names */
+	const char *day_names;
+	int day_names_pos_x, day_names_pos_y;
 
-	bitmap_clear(bmp, calendar->style->background_color);
+	day_names_pos_x = month_and_year_pos_x;
+	day_names_pos_y = month_and_year_pos_y + calendar->style->font->height;
+	day_names = " Su Mo Tu We Th Fr Sa";
 
-	snprintf(buff, sizeof(buff), "%10s %-10d", calendar_get_month_name(calendar->month), calendar->year);
-	label_render_onto(buff, calendar->font, calendar->style->text_color, xpos, ypos, bmp);
-	ypos += calendar->font->height;
+	label_render_onto(
+		day_names, calendar->style->font, calendar->style->foreground,
+		day_names_pos_x, day_names_pos_y, bmp
+	);
 
-	label_render_onto(" Su Mo Tu We Th Fr Sa", calendar->font, calendar->style->text_color, xpos, ypos, bmp);
-	ypos += calendar->font->height;
-
-	xpos = xstart + calendar->font->width * current.tm_wday * 3;
+	/* render days */
+	int numdays;
+	int month_offset;
+	int day_pos_x, day_pos_y;
+	int day_max_pos_x;
+	char day[32];
+	struct tm now;
 
 	numdays = calendar_get_month_days(calendar->month, calendar->year);
+	month_offset = calendar_get_month_offset(calendar->month, calendar->year);
+	day_pos_x = day_names_pos_x + month_offset * 3 * calendar->style->font->width;
+	day_pos_y = day_names_pos_y + calendar->style->font->height;
+	day_max_pos_x = day_names_pos_x + calendar->style->font->width * 21;
+	now = localtime((const time_t[1]){ time(NULL) })[0];
 
-	for (int32_t day = 0; day < numdays; ++day) {
-		int32_t spaces = day >= 9 ? 1 : 2;
-		int32_t is_today = current.tm_year == now.tm_year && current.tm_mon == now.tm_mon && (day + 1) == now.tm_mday;
+	for (int i = 0; i < numdays; ++i) {
+		snprintf(day, sizeof(day), "%3d", i+1);
 
-		xpos += spaces * calendar->font->width;
-		snprintf(buff, sizeof(buff), "%d", day + 1);
+		if (now.tm_year == calendar->year - 1900 &&
+		    now.tm_mon == calendar->month &&
+		    now.tm_mday == i + 1)
+		{
+			bitmap_rect(
+				bmp, day_pos_x + (i >= 9 ? calendar->style->font->width : 0),
+				day_pos_y, (i >= 9 ? 2 : 3) * calendar->style->font->width,
+				calendar->style->font->height, calendar->style->foreground
+			);
 
-		if (is_today) {
-			bitmap_rect(bmp, xpos, ypos, calendar->font->width * (3 - spaces), calendar->font->height, calendar->style->text_color);
-			label_render_onto(buff, calendar->font, calendar->style->background_color, xpos, ypos, bmp);
+			label_render_onto(
+				day, calendar->style->font, calendar->style->background,
+				day_pos_x, day_pos_y, bmp
+			);
 		}
 		else {
-			label_render_onto(buff, calendar->font, calendar->style->text_color, xpos, ypos, bmp);
+			label_render_onto(
+				day, calendar->style->font, calendar->style->foreground,
+				day_pos_x, day_pos_y, bmp
+			);
 		}
 
-		xpos += (3 - spaces) * calendar->font->width;
+		day_pos_x += calendar->style->font->width * 3;
 
-		if (xpos == (xstart + width)) {
-			xpos = xstart;
-			ypos += calendar->font->height;
+		if (day_pos_x == day_max_pos_x) {
+			day_pos_x = day_names_pos_x;
+			day_pos_y += calendar->style->font->height;
 		}
 	}
 }
 
 extern void
-calendar_free(calendar_t *calendar) {
+calendar_free(calendar_t *calendar)
+{
 	free(calendar);
 }

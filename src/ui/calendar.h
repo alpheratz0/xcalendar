@@ -27,22 +27,21 @@ typedef struct calendar calendar_t;
 typedef struct calendar_style calendar_style_t;
 
 struct calendar_style {
-	uint32_t text_color;
-	uint32_t background_color;
+	font_t *font;
+	uint32_t foreground;
+	uint32_t background;
 };
 
 struct calendar {
-	font_t *font;
 	calendar_style_t *style;
-	int32_t month;
-	int32_t year;
+	int month, year;
 };
 
 extern calendar_style_t
-calendar_style_from(uint32_t text_color, uint32_t background_color);
+calendar_style_from(font_t *font, uint32_t foreground, uint32_t background);
 
 extern calendar_t *
-calendar_create(font_t *font, calendar_style_t *style);
+calendar_create(calendar_style_t *style);
 
 extern void
 calendar_goto_next_month(calendar_t *calendar);

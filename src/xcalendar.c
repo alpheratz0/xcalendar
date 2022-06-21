@@ -147,8 +147,8 @@ main(int argc, char **argv)
 
 	window = window_create("xcalendar", "xcalendar");
 	font = font_load("Iosevka", 40);
-	style = calendar_style_from(0xffffff, 0x000000);
-	calendar = calendar_create(font, &style);
+	style = calendar_style_from(font, 0xffffff, 0x000000);
+	calendar = calendar_create(&style);
 
 	calendar_render_onto(calendar, window->bmp);
 	window_set_key_press_callback(window, key_press_callback);
