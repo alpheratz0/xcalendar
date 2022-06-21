@@ -206,8 +206,8 @@ calendar_render_onto(calendar_t *calendar, bitmap_t *bmp)
 		    now.tm_mday == i + 1)
 		{
 			bitmap_rect(
-				bmp, day_pos_x + (i >= 9 ? calendar->style->font->width : 0),
-				day_pos_y, (i >= 9 ? 2 : 3) * calendar->style->font->width,
+				bmp, day_pos_x + calendar->style->font->width * (i >= 9 ? 1 : 2),
+				day_pos_y, calendar->style->font->width * (i >= 9 ? 2 : 1),
 				calendar->style->font->height, calendar->style->foreground
 			);
 
