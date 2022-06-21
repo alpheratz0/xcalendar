@@ -43,7 +43,8 @@ calendar_get_month_name(int month)
 }
 
 static int
-calendar_get_month_offset(int month, int year) {
+calendar_get_month_offset(int month, int year)
+{
 	struct tm tm;
 
 	tm = localtime((const time_t[1]){ time(NULL) })[0];
