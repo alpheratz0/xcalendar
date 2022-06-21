@@ -46,7 +46,7 @@ static int
 calendar_get_month_offset(int month, int year) {
 	struct tm tm;
 
-	tm = localtime((const time_t []){ time(NULL) })[0];
+	tm = localtime((const time_t[1]){ time(NULL) })[0];
 
 	tm.tm_year = year - 1900;
 	tm.tm_mon = month;
