@@ -46,7 +46,6 @@
 */
 
 #include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include "base/font.h"
@@ -55,14 +54,13 @@
 #include "x11/keys.h"
 #include "x11/window.h"
 
-static window_t *window;
-static calendar_t *calendar;
+static struct window *window;
+static struct calendar *calendar;
 
-static bool
+static int
 match_opt(const char *in, const char *sh, const char *lo)
 {
-	return (strcmp(in, sh) == 0) ||
-		   (strcmp(in, lo) == 0);
+	return (strcmp(in, sh) == 0) || (strcmp(in, lo) == 0);
 }
 
 static inline void
@@ -134,8 +132,8 @@ version(void)
 int
 main(int argc, char **argv)
 {
-	font_t *font;
-	calendar_style_t style;
+	struct font *font;
+	struct calendar_style style;
 
 	if (++argv, --argc > 0) {
 		if (match_opt(*argv, "-k", "--keybindings")) keybindings();

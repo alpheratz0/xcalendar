@@ -22,7 +22,7 @@
 
 #include "../base/bitmap.h"
 #include "../base/font.h"
-#include "../util/debug.h"
+#include "../util/xmalloc.h"
 #include "label.h"
 #include "calendar.h"
 
@@ -59,25 +59,27 @@ calendar_get_month_offset(int month, int year)
 }
 
 static int
-calendar_get_month_days(int month, int year)
+calendar_is_leap_year(int year)
 {
-	int numdays;
-
-	numdays = month_numdays[month];
-
-	if (month == 1) {
-		if (year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)) {
-			++numdays;
-		}
-	}
-
-	return numdays;
+	return year % 400 == 0 || (year % 4 == 0 && year % 100 != 0);
 }
 
-extern calendar_style_t
-calendar_style_from(font_t *font, uint32_t foreground, uint32_t background)
+static int
+calendar_get_month_days(int month, int year)
 {
-	calendar_style_t style;
+	if (month != 1 || !calendar_is_leap_year(year)) {
+		return month_numdays[month];
+	}
+
+	return 29;
+}
+
+extern struct calendar_style
+calendar_style_from(struct font *font,
+                    uint32_t foreground,
+                    uint32_t background)
+{
+	struct calendar_style style;
 
 	style.font = font;
 	style.foreground = foreground;
@@ -86,14 +88,12 @@ calendar_style_from(font_t *font, uint32_t foreground, uint32_t background)
 	return style;
 }
 
-extern calendar_t *
-calendar_create(calendar_style_t *style)
+extern struct calendar *
+calendar_create(struct calendar_style *style)
 {
-	calendar_t *calendar;
+	struct calendar *calendar;
 
-	if (NULL == (calendar = malloc(sizeof(calendar_t)))) {
-		die("error while calling malloc, no memory available");
-	}
+	calendar = xmalloc(sizeof(struct calendar));
 
 	calendar->style = style;
 
@@ -103,7 +103,7 @@ calendar_create(calendar_style_t *style)
 }
 
 extern void
-calendar_goto_next_month(calendar_t *calendar)
+calendar_goto_next_month(struct calendar *calendar)
 {
 	if (++calendar->month == 12) {
 		calendar->month = 0;
@@ -112,7 +112,7 @@ calendar_goto_next_month(calendar_t *calendar)
 }
 
 extern void
-calendar_goto_previous_month(calendar_t *calendar)
+calendar_goto_previous_month(struct calendar *calendar)
 {
 	if (--calendar->month == -1) {
 		calendar->month = 11;
@@ -124,13 +124,13 @@ calendar_goto_previous_month(calendar_t *calendar)
 }
 
 extern void
-calendar_goto_next_year(calendar_t *calendar)
+calendar_goto_next_year(struct calendar *calendar)
 {
 	++calendar->year;
 }
 
 extern void
-calendar_goto_previous_year(calendar_t *calendar)
+calendar_goto_previous_year(struct calendar *calendar)
 {
 	if (--calendar->year == 1752) {
 		calendar->year = 1753;
@@ -138,7 +138,7 @@ calendar_goto_previous_year(calendar_t *calendar)
 }
 
 extern void
-calendar_goto_current_month(calendar_t *calendar)
+calendar_goto_current_month(struct calendar *calendar)
 {
 	const struct tm *now;
 
@@ -148,7 +148,7 @@ calendar_goto_current_month(calendar_t *calendar)
 }
 
 extern void
-calendar_render_onto(calendar_t *calendar, bitmap_t *bmp)
+calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 {
 	/* clear the bitmap */
 	bitmap_clear(bmp, calendar->style->background);
@@ -234,7 +234,7 @@ calendar_render_onto(calendar_t *calendar, bitmap_t *bmp)
 }
 
 extern void
-calendar_free(calendar_t *calendar)
+calendar_free(struct calendar *calendar)
 {
 	free(calendar);
 }

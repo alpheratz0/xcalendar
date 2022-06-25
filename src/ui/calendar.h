@@ -23,45 +23,44 @@
 #include "../base/font.h"
 #include "../base/bitmap.h"
 
-typedef struct calendar calendar_t;
-typedef struct calendar_style calendar_style_t;
-
 struct calendar_style {
-	font_t *font;
+	struct font *font;
 	uint32_t foreground;
 	uint32_t background;
 };
 
 struct calendar {
-	calendar_style_t *style;
+	struct calendar_style *style;
 	int month, year;
 };
 
-extern calendar_style_t
-calendar_style_from(font_t *font, uint32_t foreground, uint32_t background);
+extern struct calendar_style
+calendar_style_from(struct font *font,
+                    uint32_t foreground,
+                    uint32_t background);
 
-extern calendar_t *
-calendar_create(calendar_style_t *style);
-
-extern void
-calendar_goto_next_month(calendar_t *calendar);
-
-extern void
-calendar_goto_previous_month(calendar_t *calendar);
+extern struct calendar *
+calendar_create(struct calendar_style *style);
 
 extern void
-calendar_goto_next_year(calendar_t *calendar);
+calendar_goto_next_month(struct calendar *calendar);
 
 extern void
-calendar_goto_previous_year(calendar_t *calendar);
+calendar_goto_previous_month(struct calendar *calendar);
 
 extern void
-calendar_goto_current_month(calendar_t *calendar);
+calendar_goto_next_year(struct calendar *calendar);
 
 extern void
-calendar_render_onto(calendar_t *calendar, bitmap_t *bmp);
+calendar_goto_previous_year(struct calendar *calendar);
 
 extern void
-calendar_free(calendar_t *calendar);
+calendar_goto_current_month(struct calendar *calendar);
+
+extern void
+calendar_render_onto(struct calendar *calendar, struct bitmap *bmp);
+
+extern void
+calendar_free(struct calendar *calendar);
 
 #endif

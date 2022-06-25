@@ -16,7 +16,8 @@ SRC = src/base/bitmap.c \
 	  src/ui/label.c \
 	  src/x11/window.c \
 	  src/util/color.c \
-	  src/util/debug.c
+	  src/util/debug.c \
+	  src/util/xmalloc.c
 
 OBJ = ${SRC:.c=.o}
 
@@ -29,35 +30,36 @@ ${OBJ}: src/base/font.h \
 		src/x11/window.h \
 		src/x11/keys.h \
 		src/util/debug.h \
-		src/util/color.h
+		src/util/color.h \
+		src/util/xmalloc.h
 
 xcalendar: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 install: all
-	@mkdir -p ${DESTDIR}${PREFIX}/bin
-	@cp -f xcalendar ${DESTDIR}${PREFIX}/bin
-	@chmod 755 ${DESTDIR}${PREFIX}/bin/xcalendar
-	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	@cp -f man/xcalendar.1 ${DESTDIR}${MANPREFIX}/man1
-	@chmod 644 ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
-	@mkdir -p ${DESTDIR}${APPPREFIX}
-	@cp -f misc/xcalendar.desktop ${DESTDIR}${APPPREFIX}/xcalendar.desktop
-	@chmod 644 ${DESTDIR}${APPPREFIX}/xcalendar.desktop
+	mkdir -p ${DESTDIR}${PREFIX}/bin
+	cp -f xcalendar ${DESTDIR}${PREFIX}/bin
+	chmod 755 ${DESTDIR}${PREFIX}/bin/xcalendar
+	mkdir -p ${DESTDIR}${MANPREFIX}/man1
+	cp -f man/xcalendar.1 ${DESTDIR}${MANPREFIX}/man1
+	chmod 644 ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
+	mkdir -p ${DESTDIR}${APPPREFIX}
+	cp -f misc/xcalendar.desktop ${DESTDIR}${APPPREFIX}/xcalendar.desktop
+	chmod 644 ${DESTDIR}${APPPREFIX}/xcalendar.desktop
 
 dist: clean
-	@mkdir -p xcalendar-${VERSION}
-	@cp -R LICENSE Makefile README misc man src xcalendar-${VERSION}
-	@tar -cf xcalendar-${VERSION}.tar xcalendar-${VERSION}
-	@gzip xcalendar-${VERSION}.tar
-	@rm -rf xcalendar-${VERSION}
+	mkdir -p xcalendar-${VERSION}
+	cp -R LICENSE Makefile README misc man src xcalendar-${VERSION}
+	tar -cf xcalendar-${VERSION}.tar xcalendar-${VERSION}
+	gzip xcalendar-${VERSION}.tar
+	rm -rf xcalendar-${VERSION}
 
 uninstall:
-	@rm -f ${DESTDIR}${PREFIX}/bin/xcalendar
-	@rm -f ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
-	@rm -f ${DESTDIR}${APPPREFIX}/xcalendar.desktop
+	rm -f ${DESTDIR}${PREFIX}/bin/xcalendar
+	rm -f ${DESTDIR}${MANPREFIX}/man1/xcalendar.1
+	rm -f ${DESTDIR}${APPPREFIX}/xcalendar.desktop
 
 clean:
-	@rm -f xcalendar xcalendar-${VERSION}.tar.gz ${OBJ}
+	rm -f xcalendar xcalendar-${VERSION}.tar.gz ${OBJ}
 
 .PHONY: all clean install uninstall dist
