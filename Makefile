@@ -1,12 +1,15 @@
 VERSION = 0.3.14
-PREFIX = /usr/local
+
+CC     = cc
+INCS   = -I/usr/include/freetype2
+CFLAGS = -std=c99 -pedantic -Wall -Wextra -Os ${INCS} -DVERSION=\"${VERSION}\"
+
+LDLIBS  = -lxcb -lfreetype -lxcb-image -lfontconfig
+LDFLAGS = -s ${LDLIBS}
+
+PREFIX    = /usr/local
 MANPREFIX = ${PREFIX}/share/man
 APPPREFIX = ${PREFIX}/share/applications
-LDLIBS = -lxcb -lfreetype -lxcb-image -lfontconfig
-LDFLAGS = -s ${LDLIBS}
-INCS = -I/usr/include -I/usr/include/freetype2
-CFLAGS = -std=c99 -pedantic -Wall -Wextra -Os ${INCS} -DVERSION=\"${VERSION}\"
-CC = cc
 
 SRC = src/base/bitmap.c \
 	  src/base/font.c \
