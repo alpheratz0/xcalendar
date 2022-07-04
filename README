@@ -1,12 +1,16 @@
-xcalendar
-=========
-simple X11 program that shows the current month, preview: https://i.imgur.com/LJJVsXt.mp4
+]|~ xcalendar ~|[
 
-build
-=====
-in order to build xcalendar you will need xcb, freetype and fontconfig headers
+Simple X11 program that lets you navigate through the calendar.
+
+]|~ build ~|[
+
+In order to build xcalendar you will need xcb, xcb-image,
+freetype and fontconfig headers.
 $ make
 
-install
-=======
-# make install
+]|~ license ~|[
+
+This program is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License
+version 2 as published by the Free Software Foundation.
+See LICENSE for more details.
