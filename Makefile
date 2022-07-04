@@ -5,8 +5,7 @@ APPPREFIX = ${PREFIX}/share/applications
 LDLIBS = -lxcb -lfreetype -lxcb-image -lfontconfig
 LDFLAGS = -s ${LDLIBS}
 INCS = -I/usr/include -I/usr/include/freetype2
-CFLAGS = -std=c99 -pedantic -Wall -Wextra -Os ${INCS} -DVERSION="\"${VERSION}\"" \
-		 -D_XOPEN_SOURCE=500
+CFLAGS = -std=c99 -pedantic -Wall -Wextra -Os ${INCS} -DVERSION="\"${VERSION}\""
 CC = cc
 
 SRC = src/base/bitmap.c \
