@@ -185,6 +185,7 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 	);
 
 	/* render days */
+	int i;
 	int numdays;
 	int month_offset;
 	int day_pos_x, day_pos_y;
@@ -199,7 +200,7 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 	day_max_pos_x = day_names_pos_x + calendar->style->font->width * 21;
 	now = localtime((const time_t[1]){ time(NULL) })[0];
 
-	for (int i = 0; i < numdays; ++i) {
+	for (i = 0; i < numdays; ++i) {
 		snprintf(day, sizeof(day), "%3d", i+1);
 
 		if (now.tm_year == calendar->year - 1900 &&
