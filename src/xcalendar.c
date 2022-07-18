@@ -92,8 +92,6 @@ key_press_callback(uint32_t key)
 		case KEY_C:
 			calendar_goto_current_month(calendar);
 			break;
-		default:
-			return;
 	}
 
 	calendar_render_onto(calendar, window->bmp);
