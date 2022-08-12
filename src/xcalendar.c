@@ -47,49 +47,37 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <xkbcommon/xkbcommon-keysyms.h>
 
 #include "base/font.h"
 #include "ui/calendar.h"
 #include "util/debug.h"
-#include "x11/keys.h"
 #include "x11/window.h"
 
 static struct window *window;
 static struct calendar *calendar;
 
-static int
-match_opt(const char *in, const char *sh, const char *lo)
-{
-	return (strcmp(in, sh) == 0) || (strcmp(in, lo) == 0);
-}
-
-static inline void
-print_opt(const char *sh, const char *lo, const char *desc)
-{
-	printf("%7s | %-25s %s\n", sh, lo, desc);
-}
-
 static void
-key_press_callback(uint32_t key)
+key_press_callback(xcb_keysym_t key)
 {
 	switch (key) {
-		case KEY_ESCAPE:
-		case KEY_Q:
+		case XKB_KEY_Escape:
+		case XKB_KEY_q:
 			window_loop_end(window);
 			return;
-		case KEY_H:
+		case XKB_KEY_h:
 			calendar_goto_previous_month(calendar);
 			break;
-		case KEY_L:
+		case XKB_KEY_l:
 			calendar_goto_next_month(calendar);
 			break;
-		case KEY_J:
+		case XKB_KEY_j:
 			calendar_goto_previous_year(calendar);
 			break;
-		case KEY_K:
+		case XKB_KEY_k:
 			calendar_goto_next_year(calendar);
 			break;
-		case KEY_C:
+		case XKB_KEY_c:
 			calendar_goto_current_month(calendar);
 			break;
 	}
@@ -101,11 +89,7 @@ key_press_callback(uint32_t key)
 static void
 usage(void)
 {
-	puts("Usage: xcalendar [ -hkv ]");
-	puts("Options are:");
-	print_opt("-h", "--help", "display this message and exit");
-	print_opt("-k", "--keybindings", "display the keybindings");
-	print_opt("-v", "--version", "display the program version");
+	puts("usage: xcalendar [-hkv]");
 	exit(0);
 }
 
@@ -134,9 +118,9 @@ main(int argc, char **argv)
 	struct calendar_style style;
 
 	if (++argv, --argc > 0) {
-		if (match_opt(*argv, "-k", "--keybindings")) keybindings();
-		else if (match_opt(*argv, "-h", "--help")) usage();
-		else if (match_opt(*argv, "-v", "--version")) version();
+		if (!strcmp(*argv, "-k")) keybindings();
+		else if (!strcmp(*argv, "-h")) usage();
+		else if (!strcmp(*argv, "-v")) version();
 		else if (**argv == '-') dief("invalid option %s", *argv);
 		else dief("unexpected argument: %s", *argv);
 	}
