@@ -166,7 +166,7 @@ window_create(const char *title, const char *class)
 	evmask = XCB_EVENT_MASK_EXPOSURE |
 	         XCB_EVENT_MASK_KEY_PRESS |
 	         XCB_EVENT_MASK_KEY_RELEASE |
-			 XCB_EVENT_MASK_KEYMAP_STATE;
+	         XCB_EVENT_MASK_KEYMAP_STATE;
 
 	xcb_create_window(
 		conn, XCB_COPY_FROM_PARENT, wid, screen->root, 0, 0, bmp->width,
