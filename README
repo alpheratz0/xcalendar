@@ -4,7 +4,7 @@ Simple X11 program that lets you navigate through the calendar.
 
 ]|~ build ~|[
 
-In order to build xcalendar you will need xcb, xcb-image,
+In order to build xcalendar you will need xcb, xcb-image, xcb-keysyms,
 freetype and fontconfig headers.
 $ make
 
