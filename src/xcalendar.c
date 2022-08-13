@@ -89,18 +89,7 @@ key_press_callback(xcb_keysym_t key)
 static void
 usage(void)
 {
-	puts("usage: xcalendar [-hkv]");
-	exit(0);
-}
-
-static void
-keybindings(void)
-{
-	puts("Keybindings are:");
-	puts("h/l: see the previous/next month");
-	puts("j/k: see the previous/next year");
-	puts("c: see the current month");
-	puts("q/esc: exit");
+	puts("usage: xcalendar [-hv]");
 	exit(0);
 }
 
@@ -118,8 +107,7 @@ main(int argc, char **argv)
 	struct calendar_style style;
 
 	if (++argv, --argc > 0) {
-		if (!strcmp(*argv, "-k")) keybindings();
-		else if (!strcmp(*argv, "-h")) usage();
+		if (!strcmp(*argv, "-h")) usage();
 		else if (!strcmp(*argv, "-v")) version();
 		else if (**argv == '-') dief("invalid option %s", *argv);
 		else dief("unexpected argument: %s", *argv);
