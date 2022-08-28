@@ -67,17 +67,13 @@ calendar_is_leap_year(int year)
 static int
 calendar_get_month_days(int month, int year)
 {
-	if (month != 1 || !calendar_is_leap_year(year)) {
+	if (month != 1 || !calendar_is_leap_year(year))
 		return month_numdays[month];
-	}
-
 	return 29;
 }
 
 extern struct calendar_style
-calendar_style_from(struct font *font,
-                    uint32_t foreground,
-                    uint32_t background)
+calendar_style_from(struct font *font, uint32_t foreground, uint32_t background)
 {
 	struct calendar_style style;
 
@@ -132,9 +128,8 @@ calendar_goto_next_year(struct calendar *calendar)
 extern void
 calendar_goto_previous_year(struct calendar *calendar)
 {
-	if (--calendar->year == 1752) {
+	if (--calendar->year == 1752)
 		calendar->year = 1753;
-	}
 }
 
 extern void

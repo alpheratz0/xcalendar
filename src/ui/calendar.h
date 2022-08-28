@@ -35,9 +35,7 @@ struct calendar {
 };
 
 extern struct calendar_style
-calendar_style_from(struct font *font,
-                    uint32_t foreground,
-                    uint32_t background);
+calendar_style_from(struct font *font, uint32_t foreground, uint32_t background);
 
 extern struct calendar *
 calendar_create(struct calendar_style *style);
