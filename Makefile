@@ -1,18 +1,7 @@
 .POSIX:
 .PHONY: all clean install uninstall dist
 
-VERSION = 0.3.15
-
-CC      = cc
-INCS    = -I/usr/include/freetype2
-CFLAGS  = -std=c99 -pedantic -Wall -Wextra -Os $(INCS) -DVERSION=\"$(VERSION)\"
-LDLIBS  = -lxcb -lfreetype -lxcb-image -lxcb-keysyms -lfontconfig
-LDFLAGS = -s
-
-
-PREFIX    = /usr/local
-MANPREFIX = $(PREFIX)/share/man
-APPPREFIX = $(PREFIX)/share/applications
+include config.mk
 
 SRC = src/base/bitmap.c src/base/font.c src/xcalendar.c src/ui/calendar.c src/ui/label.c src/x11/window.c src/util/color.c src/util/debug.c src/util/xmalloc.c
 OBJ = src/base/bitmap.o src/base/font.o src/xcalendar.o src/ui/calendar.o src/ui/label.o src/x11/window.o src/util/color.o src/util/debug.o src/util/xmalloc.o
@@ -38,7 +27,7 @@ install: all
 
 dist: clean
 	mkdir -p xcalendar-$(VERSION)
-	cp -R COPYING Makefile README misc src man xcalendar-$(VERSION)
+	cp -R COPYING config.mk Makefile README misc src man xcalendar-$(VERSION)
 	tar -cf xcalendar-$(VERSION).tar xcalendar-$(VERSION)
 	gzip xcalendar-$(VERSION).tar
 	rm -rf xcalendar-$(VERSION)
