@@ -106,11 +106,16 @@ main(int argc, char **argv)
 	struct font *font;
 	struct calendar_style style;
 
-	if (++argv, --argc > 0) {
-		if (!strcmp(*argv, "-h")) usage();
-		else if (!strcmp(*argv, "-v")) version();
-		else if (**argv == '-') dief("invalid option %s", *argv);
-		else dief("unexpected argument: %s", *argv);
+	while (++argv, --argc > 0) {
+		if ((*argv)[0] == '-' && (*argv)[1] != '\0' && (*argv)[2] == '\0') {
+			switch ((*argv)[1]) {
+				case 'h': usage(); break;
+				case 'v': version(); break;
+				default: die("invalid option %s", *argv); break;
+			}
+		} else {
+			die("unexpected argument: %s", *argv);
+		}
 	}
 
 	window = window_create("xcalendar", "xcalendar");
