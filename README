@@ -1,14 +1,9 @@
-]|~ xcalendar ~|[
+simple X11 program that lets you navigate through the calendar.
+For more information about it's usage check `man xcalendar`.
 
-Simple X11 program that lets you navigate through the calendar.
-
-]|~ build ~|[
-
-In order to build xcalendar you will need xcb, xcb-image, xcb-keysyms,
-freetype and fontconfig headers.
-$ make
-
-]|~ license ~|[
+This program requires libxcb and libxcb-image, libxcb-keysyms,
+libfreetype2 and libfontconfig to be installed.
+In order to build this program you need to run `make`.
 
 This program is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License
