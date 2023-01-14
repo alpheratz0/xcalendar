@@ -179,6 +179,7 @@ window_create(const char *title, const char *class)
 	window->bmp = bmp;
 	window->gc = gc;
 	window->ksyms = ksyms;
+	window->key_pressed = NULL;
 
 	return window;
 }
@@ -212,9 +213,11 @@ h_key_press(struct window *window, xcb_key_press_event_t *ev)
 {
 	xcb_keysym_t keysym;
 
-	keysym = xcb_key_symbols_get_keysym(window->ksyms, ev->detail, 0);
+	keysym = xcb_key_symbols_get_keysym(window->ksyms, ev->detail,
+			ev->state & XCB_MOD_MASK_SHIFT);
 
-	window->key_pressed(keysym);
+	if (NULL != window->key_pressed)
+		window->key_pressed(keysym);
 }
 
 static void
