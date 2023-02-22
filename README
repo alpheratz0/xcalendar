@@ -1,3 +1,10 @@
+                    __               __
+   _  ___________ _/ /__  ____  ____/ /___ ______
+  | |/_/ ___/ __ `/ / _ \/ __ \/ __  / __ `/ ___/
+ _>  </ /__/ /_/ / /  __/ / / / /_/ / /_/ / /
+/_/|_|\___/\__,_/_/\___/_/ /_/\__,_/\__,_/_/
+
+
 simple X11 program that lets you navigate through the calendar.
 For more information about it's usage check `man xcalendar`.
 
