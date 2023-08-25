@@ -3,8 +3,16 @@
 
 include config.mk
 
-SRC = src/base/bitmap.c src/base/font.c src/xcalendar.c src/ui/calendar.c src/ui/label.c src/x11/window.c src/util/color.c src/util/debug.c src/util/xmalloc.c
-OBJ = src/base/bitmap.o src/base/font.o src/xcalendar.o src/ui/calendar.o src/ui/label.o src/x11/window.o src/util/color.o src/util/debug.o src/util/xmalloc.o
+OBJ=\
+	src/base/bitmap.o \
+	src/base/font.o \
+	src/xcalendar.o \
+	src/ui/label.o \
+	src/ui/calendar.o \
+	src/x11/window.o \
+	src/util/color.o \
+	src/util/debug.o \
+	src/util/xmalloc.o
 
 all: xcalendar
 
@@ -12,7 +20,7 @@ xcalendar: $(OBJ)
 	$(CC) $(LDFLAGS) -o xcalendar $(OBJ) $(LDLIBS)
 
 clean:
-	rm -f xcalendar xcalendar.o xcalendar-$(VERSION).tar.gz $(OBJ)
+	rm -f xcalendar $(OBJ) xcalendar-$(VERSION).tar.gz
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
