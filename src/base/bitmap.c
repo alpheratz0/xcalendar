@@ -67,11 +67,10 @@ bitmap_rect(struct bitmap *bmp, uint32_t x, uint32_t y,
 extern void
 bitmap_clear(struct bitmap *bmp, uint32_t color)
 {
-	uint32_t x, y;
+	uint32_t i;
 
-	for (x = 0; x < bmp->width; ++x)
-		for (y = 0; y < bmp->height; ++y)
-			bmp->px[y*bmp->width+x] = color;
+	for (i = 0; i < bmp->width * bmp->height; ++i)
+		bmp->px[i] = color;
 }
 
 extern void
