@@ -59,8 +59,8 @@ bitmap_rect(struct bitmap *bmp, uint32_t x, uint32_t y,
 {
 	uint32_t i, j;
 
-	for (i = 0; i < width; ++i)
-		for (j = 0; j < height; ++j)
+	for (j = 0; j < height; ++j)
+		for (i = 0; i < width; ++i)
 			bmp->px[(j+y)*bmp->width+i+x] = color;
 }
 
