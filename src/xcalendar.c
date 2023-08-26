@@ -62,25 +62,12 @@ static void
 key_press_callback(xcb_keysym_t key)
 {
 	switch (key) {
-		case XKB_KEY_Escape:
-		case XKB_KEY_q:
-			window_loop_end(window);
-			return;
-		case XKB_KEY_h:
-			calendar_goto_previous_month(calendar);
-			break;
-		case XKB_KEY_l:
-			calendar_goto_next_month(calendar);
-			break;
-		case XKB_KEY_j:
-			calendar_goto_previous_year(calendar);
-			break;
-		case XKB_KEY_k:
-			calendar_goto_next_year(calendar);
-			break;
-		case XKB_KEY_c:
-			calendar_goto_current_month(calendar);
-			break;
+	case XKB_KEY_Escape: window_loop_end(window);           return;
+	case XKB_KEY_h: calendar_goto_previous_month(calendar);  break;
+	case XKB_KEY_l: calendar_goto_next_month(calendar);      break;
+	case XKB_KEY_j: calendar_goto_previous_year(calendar);   break;
+	case XKB_KEY_k: calendar_goto_next_year(calendar);       break;
+	case XKB_KEY_c: calendar_goto_current_month(calendar);   break;
 	}
 
 	calendar_render_onto(calendar, window->bmp);
@@ -110,9 +97,9 @@ main(int argc, char **argv)
 	while (++argv, --argc > 0) {
 		if ((*argv)[0] == '-' && (*argv)[1] != '\0' && (*argv)[2] == '\0') {
 			switch ((*argv)[1]) {
-				case 'h': usage(); break;
-				case 'v': version(); break;
-				default: die("invalid option %s", *argv); break;
+			case 'h': usage(); break;
+			case 'v': version(); break;
+			default: die("invalid option %s", *argv); break;
 			}
 		} else {
 			die("unexpected argument: %s", *argv);
