@@ -16,6 +16,8 @@
 
 */
 
+#include <errno.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -23,6 +25,7 @@
 
 #include "../base/bitmap.h"
 #include "../base/font.h"
+#include "../util/debug.h"
 #include "../util/xmalloc.h"
 #include "label.h"
 #include "calendar.h"
@@ -43,12 +46,31 @@ calendar_get_month_name(int month)
 	return month_names[month];
 }
 
+static struct tm
+calendar_get_current_time(void)
+{
+	time_t t;
+	struct tm *tmb;
+
+	t = time(NULL);
+
+	if (t == (time_t)(-1))
+		die("time() failed: ", strerror(errno));
+
+	tmb = localtime(&t);
+
+	if (NULL == tmb)
+		die("can't convert time");
+
+	return *tmb;
+}
+
 static int
 calendar_get_month_offset(int month, int year)
 {
 	struct tm tm;
 
-	tm = localtime((const time_t[1]){ time(NULL) })[0];
+	tm = calendar_get_current_time();
 
 	tm.tm_year = year - 1900;
 	tm.tm_mon = month;
@@ -136,11 +158,11 @@ calendar_goto_previous_year(struct calendar *calendar)
 extern void
 calendar_goto_current_month(struct calendar *calendar)
 {
-	const struct tm *now;
+	struct tm now;
 
-	now = localtime((const time_t[1]) { time(NULL) });
-	calendar->year = now->tm_year + 1900;
-	calendar->month = now->tm_mon;
+	now = calendar_get_current_time();
+	calendar->year = now.tm_year + 1900;
+	calendar->month = now.tm_mon;
 }
 
 extern void
@@ -194,7 +216,7 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 	day_pos_x = day_names_pos_x + month_offset * 3 * calendar->style->font->width;
 	day_pos_y = day_names_pos_y + calendar->style->font->height;
 	day_max_pos_x = day_names_pos_x + calendar->style->font->width * 21;
-	now = localtime((const time_t[1]){ time(NULL) })[0];
+	now = calendar_get_current_time();
 
 	for (i = 0; i < numdays; ++i) {
 		snprintf(day, sizeof(day), "%3d", i+1);
