@@ -1,7 +1,7 @@
 # Copyright (C) 2022-2023 <alpheratz99@protonmail.com>
 # This program is free software.
 
-VERSION = 0.3.16
+VERSION = 0.3.17
 
 PREFIX = /usr/local
 MANPREFIX = $(PREFIX)/share/man
