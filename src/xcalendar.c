@@ -107,7 +107,7 @@ main(int argc, char **argv)
 	}
 
 	window = window_create("xcalendar", "xcalendar");
-	font = font_load("Iosevka", 40);
+	font = font_load("Monospace", 40);
 	style = calendar_style_from(font, 0xffffff, 0x000000);
 	calendar = calendar_create(&style);
 
