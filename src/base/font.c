@@ -50,13 +50,8 @@ font_search(const char *family)
 		FcDefaultSubstitute(pattern);
 
 		if ((match = FcFontMatch(0, pattern, &result))) {
-			FcPatternGet(match, FC_FAMILY, 0, &v);
-
-			if (strcmp(family, (char *)(v.u.s)) == 0) {
-				FcPatternGet(match, FC_FILE, 0, &v);
-				path = strdup((char *)(v.u.s));
-			}
-
+			FcPatternGet(match, FC_FILE, 0, &v);
+			path = strdup((char *)(v.u.s));
 			FcPatternDestroy(match);
 		}
 
