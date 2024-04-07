@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2024 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -31,6 +31,7 @@ typedef void (*window_key_press_callback_t)(xcb_keysym_t key);
 
 struct window {
 	xcb_window_t id;
+	xcb_window_t revert_focus;
 	xcb_connection_t *connection;
 	xcb_screen_t *screen;
 	xcb_key_symbols_t *ksyms;

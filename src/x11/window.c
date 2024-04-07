@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022-2023 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2024 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -16,6 +16,10 @@
 
 */
 
+#define _DEFAULT_SOURCE
+
+#include <unistd.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -51,6 +55,66 @@ xatom(xcb_connection_t *conn, const char *name)
 	return atom;
 }
 
+static xcb_window_t
+get_focused_window(xcb_connection_t *conn)
+{
+	xcb_window_t win;
+	xcb_generic_error_t *error;
+	xcb_get_input_focus_cookie_t cookie;
+	xcb_get_input_focus_reply_t *reply;
+
+	cookie = xcb_get_input_focus(conn);
+	reply = xcb_get_input_focus_reply(conn, cookie, &error);
+
+	if (NULL != error)
+		die("xcb_get_input_focus failed with error code: %hhu",
+				error->error_code);
+
+	win = reply->focus;
+	free(reply);
+
+	return win;
+}
+
+static void
+set_focused_window(xcb_connection_t *conn, xcb_window_t win)
+{
+	xcb_generic_error_t *error;
+	xcb_void_cookie_t cookie;
+
+	cookie = xcb_set_input_focus_checked(conn,
+			XCB_INPUT_FOCUS_POINTER_ROOT, win, XCB_CURRENT_TIME);
+	xcb_flush(conn);
+	error = xcb_request_check(conn, cookie);
+
+	if (NULL != error)
+		die("xcb_set_input_focus failed with error code: %hhu",
+				error->error_code);
+}
+
+static bool
+grab_keyboard(xcb_connection_t *conn, xcb_window_t win)
+{
+	bool grabbed;
+	xcb_generic_error_t *error;
+	xcb_grab_keyboard_cookie_t cookie;
+	xcb_grab_keyboard_reply_t *reply;
+
+	grabbed = false;
+	cookie = xcb_grab_keyboard(conn, 1, win, XCB_CURRENT_TIME,
+			XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC);
+	reply = xcb_grab_keyboard_reply(conn, cookie, &error);
+
+	if (NULL != error)
+		die("xcb_grab_keyboard failed with error code: %hhu",
+				error->error_code);
+
+	grabbed = NULL != reply && reply->status == XCB_GRAB_STATUS_SUCCESS;
+	free(reply);
+
+	return grabbed;
+}
+
 static void
 window_get_size(xcb_connection_t *conn, xcb_window_t wid,
                 uint16_t *width, uint16_t *height)
@@ -73,12 +137,11 @@ window_get_size(xcb_connection_t *conn, xcb_window_t wid,
 }
 
 static void
-window_set_fullscreen(xcb_connection_t *conn, xcb_window_t wid)
+window_set_override_redirect(xcb_connection_t *conn, xcb_window_t wid,
+		uint32_t override_redirect)
 {
-	xcb_change_property(
-		conn, XCB_PROP_MODE_REPLACE, wid, xatom(conn, "_NET_WM_STATE"),
-		XCB_ATOM_ATOM, 32, 1, (const xcb_atom_t []) { xatom(conn, "_NET_WM_STATE_FULLSCREEN") }
-	);
+	xcb_change_window_attributes(conn, wid, XCB_CW_OVERRIDE_REDIRECT,
+		&override_redirect);
 }
 
 static void
@@ -128,10 +191,12 @@ window_create(const char *title, const char *class)
 	xcb_screen_t *screen;
 	xcb_key_symbols_t *ksyms;
 	xcb_window_t wid;
+	xcb_window_t revert_focus;
 	xcb_gcontext_t gc;
 	xcb_image_t *image;
 	struct bitmap *bmp;
 	struct window *window;
+	int grab_attempt;
 
 	if (xcb_connection_has_error((conn = xcb_connect(NULL, NULL))))
 		die("can't open display");
@@ -139,6 +204,7 @@ window_create(const char *title, const char *class)
 	if (NULL == (screen = xcb_setup_roots_iterator(xcb_get_setup(conn)).data))
 		die("can't get default screen");
 
+	revert_focus = get_focused_window(conn);
 	ksyms = xcb_key_symbols_alloc(conn);
 	wid = xcb_generate_id(conn);
 	gc = xcb_generate_id(conn);
@@ -150,24 +216,35 @@ window_create(const char *title, const char *class)
 		(uint8_t *)(bmp->px)
 	);
 
-	xcb_create_window_aux(
-		conn, XCB_COPY_FROM_PARENT, wid, screen->root, 0, 0, bmp->width, bmp->height,
-		0, XCB_WINDOW_CLASS_INPUT_OUTPUT, screen->root_visual, XCB_CW_EVENT_MASK,
-		(const xcb_create_window_value_list_t []) {{
-			.event_mask = XCB_EVENT_MASK_EXPOSURE |
-			              XCB_EVENT_MASK_KEY_PRESS |
-			              XCB_EVENT_MASK_KEY_RELEASE
-		}}
+	xcb_create_window_aux(conn, XCB_COPY_FROM_PARENT, wid, screen->root,
+			0, 0, screen->width_in_pixels, screen->height_in_pixels,
+			0, XCB_WINDOW_CLASS_INPUT_OUTPUT, screen->root_visual,
+			XCB_CW_EVENT_MASK,
+			(const xcb_create_window_value_list_t []) {{
+				.event_mask = XCB_EVENT_MASK_EXPOSURE |
+					XCB_EVENT_MASK_KEY_PRESS |
+					XCB_EVENT_MASK_KEY_RELEASE
+			}}
 	);
 
 	xcb_create_gc(conn, gc, wid, 0, NULL);
 
 	window_set_wm_name(conn, wid, title);
 	window_set_wm_class(conn, wid, class, class);
-	window_set_fullscreen(conn, wid);
+	window_set_override_redirect(conn, wid, 0x1);
 	window_enable_wm_delete_window(conn, wid);
 
 	xcb_map_window(conn, wid);
+
+	for (grab_attempt = 10; grab_attempt >= 1; --grab_attempt) {
+		if (grab_keyboard(conn, wid)) break;
+		if (grab_attempt == 1) die("failed to grab keyboard");
+		usleep(100000);
+	}
+
+	xcb_set_input_focus(conn, XCB_INPUT_FOCUS_POINTER_ROOT, wid,
+			XCB_CURRENT_TIME);
+
 	xcb_flush(conn);
 
 	window = xmalloc(sizeof(struct window));
@@ -176,6 +253,7 @@ window_create(const char *title, const char *class)
 	window->connection = conn;
 	window->screen = screen;
 	window->id = wid;
+	window->revert_focus = revert_focus;
 	window->image = image;
 	window->bmp = bmp;
 	window->gc = gc;
@@ -271,6 +349,7 @@ window_set_key_press_callback(struct window *window, window_key_press_callback_t
 extern void
 window_free(struct window *window)
 {
+	set_focused_window(window->connection, window->revert_focus);
 	xcb_key_symbols_free(window->ksyms);
 	xcb_free_gc(window->connection, window->gc);
 	xcb_disconnect(window->connection);
