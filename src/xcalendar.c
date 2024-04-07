@@ -62,6 +62,7 @@ static void
 key_press_callback(xcb_keysym_t key)
 {
 	switch (key) {
+	case XKB_KEY_q: /* FALLTHROUGH */
 	case XKB_KEY_Escape: window_loop_end(window);           return;
 	case XKB_KEY_h: calendar_goto_previous_month(calendar);  break;
 	case XKB_KEY_l: calendar_goto_next_month(calendar);      break;
