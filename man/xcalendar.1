@@ -1,4 +1,4 @@
-.Dd August 13, 2022
+.Dd June 04, 2024
 .Dt XCALENDAR 1
 .Sh NAME
 .Nm xcalendar
@@ -23,6 +23,11 @@ goto previous/next year with j/k keys
 goto current year & month with c key
 .It
 exit the program with q/escape keys
+.El
+.Sh EXAMPLES
+.Bl -tag -width indent
+.It display calendar using Norwegian locale
+LANG=nb_NO.UTF-8 xcalendar
 .El
 .Sh SEE ALSO
 .Xr X 7
