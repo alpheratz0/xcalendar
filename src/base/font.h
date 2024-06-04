@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2024 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -35,7 +35,7 @@ extern struct font *
 font_load(const char *family, uint32_t size);
 
 extern FT_GlyphSlot
-font_get_glyph(struct font *font, char c);
+font_get_glyph(struct font *font, uint32_t c);
 
 extern void
 font_unload(struct font *font);

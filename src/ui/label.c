@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2024 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -16,6 +16,7 @@
 
 */
 
+#include <grapheme.h>
 #include <stdint.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -27,7 +28,7 @@
 #include "label.h"
 
 static void
-label_render_char_onto(char c, struct font *font, uint32_t color,
+label_render_char_onto(uint32_t c, struct font *font, uint32_t color,
                        uint32_t x, uint32_t y, struct bitmap *bmp)
 {
 	FT_GlyphSlot glyph;
@@ -58,10 +59,12 @@ extern void
 label_render_onto(const char *text, struct font *font, uint32_t color,
                   uint32_t x, uint32_t y, struct bitmap *bmp)
 {
-	size_t i, len;
+	size_t i, len, off;
+	uint32_t cp;
 
-	len = strlen(text);
-
-	for (i = 0; i < len && text[i] != '\n'; ++i)
-		label_render_char_onto(text[i], font, color, x + i * font->width, y, bmp);
+	for (i = 0, off = 0; (len = grapheme_decode_utf8(text + off,
+					SIZE_MAX, &cp)) > 0 &&
+			cp != 0; off += len, ++i) {
+		label_render_char_onto(cp, font, color, x + i * font->width, y, bmp);
+	}
 }

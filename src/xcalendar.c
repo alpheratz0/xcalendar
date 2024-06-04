@@ -46,6 +46,7 @@
 
 */
 
+#include <locale.h>
 #include <stdint.h>
 #include <string.h>
 #include <xkbcommon/xkbcommon-keysyms.h>
@@ -107,6 +108,7 @@ main(int argc, char **argv)
 		}
 	}
 
+	setlocale(LC_TIME, "");
 	window = window_create("xcalendar", "xcalendar");
 	font = font_load("Monospace", 40);
 	style = calendar_style_from(font, 0xffffff, 0x000000);

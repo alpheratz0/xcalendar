@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2024 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -16,6 +16,7 @@
 
 */
 
+#include <langinfo.h>
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
@@ -30,19 +31,62 @@
 #include "label.h"
 #include "calendar.h"
 
-static const char *month_names[] = {
-	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-};
+static inline int
+get_first_weekday(void)
+{
+	const char *const s = nl_langinfo(_NL_TIME_FIRST_WEEKDAY);
 
-static const int month_numdays[] = {
-	31, 28, 31, 30, 31, 30,
-	31, 31, 30, 31, 30, 31
-};
+	if (s && *s >= 1 && *s <= 7)
+		return ((int)*s) - 1;
+
+	return 0;
+}
+
+static const char *
+cp_offset(const char *str, size_t cp)
+{
+	while (cp && *str++)
+		if (!(*str & 0x80) || ((*str & 0xC0) == 0xC0))
+			--cp;
+	return str;
+}
+
+static const char *
+calendar_get_week_fmt(void)
+{
+	static char week_fmt[128] = {0};
+	static int days[] = {ABDAY_1, ABDAY_2, ABDAY_3, ABDAY_4, ABDAY_5, ABDAY_6, ABDAY_7};
+	if (week_fmt[0] == 0) {
+		int first_weekday = get_first_weekday();
+		int off = 0;
+		for (size_t i = 0; i < sizeof(days) / sizeof(days[0]); ++i) {
+			const char *day_fmt = nl_langinfo(days[((i+first_weekday)%7+7)%7]);
+			const char *day_fmt_end = cp_offset(day_fmt, 2);
+
+			week_fmt[off++] = ' ';
+			strncpy(&week_fmt[off], day_fmt, day_fmt_end - day_fmt);
+			off += day_fmt_end - day_fmt;
+		}
+	}
+	return week_fmt;
+}
 
 static const char *
 calendar_get_month_name(int month)
 {
+	static const char *month_names[12] = {NULL};
+	static int months[sizeof(month_names) / sizeof(month_names[0])] = {
+		MON_1, MON_2, MON_3,
+		MON_4, MON_5, MON_6,
+		MON_7, MON_8, MON_9,
+		MON_10, MON_11, MON_12
+	};
+
+	if (month_names[0] == NULL) {
+		for (size_t i = 0; i < sizeof(months) / sizeof(months[0]); ++i)
+			month_names[i] = nl_langinfo(months[i]);
+	}
+
 	return month_names[month];
 }
 
@@ -78,7 +122,7 @@ calendar_get_month_offset(int month, int year)
 
 	mktime(&tm);
 
-	return tm.tm_wday;
+	return (((tm.tm_wday - get_first_weekday()) % 7) + 7) % 7;
 }
 
 static int
@@ -90,6 +134,7 @@ calendar_is_leap_year(int year)
 static int
 calendar_get_month_days(int month, int year)
 {
+	static const int month_numdays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	if (month != 1 || !calendar_is_leap_year(year))
 		return month_numdays[month];
 	return 29;
@@ -172,20 +217,17 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 	bitmap_clear(bmp, calendar->style->background);
 
 	/* render month and year */
-	char month_and_year[32];
+	char month_and_year[50];
 	int month_and_year_pos_x, month_and_year_pos_y;
 
 	month_and_year_pos_x = (bmp->width - calendar->style->font->width * 21) / 2;
-	month_and_year_pos_y = (bmp->height - calendar->style->font->height * 7) / 2;
+	month_and_year_pos_y = (bmp->height - calendar->style->font->height * 7 - 20) / 2;
 
-	snprintf(
-		month_and_year, sizeof(month_and_year), "%10s %-10d",
-		calendar_get_month_name(calendar->month), calendar->year
-	);
+	snprintf(month_and_year, sizeof(month_and_year), "%s %d", calendar_get_month_name(calendar->month), calendar->year);
 
 	label_render_onto(
 		month_and_year, calendar->style->font,
-		calendar->style->foreground, month_and_year_pos_x,
+		0xffff00, month_and_year_pos_x + ((float)(22 - strlen(month_and_year)) / 2) * calendar->style->font->width,
 		month_and_year_pos_y, bmp
 	);
 
@@ -194,11 +236,11 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 	int day_names_pos_x, day_names_pos_y;
 
 	day_names_pos_x = month_and_year_pos_x;
-	day_names_pos_y = month_and_year_pos_y + calendar->style->font->height;
-	day_names = " Su Mo Tu We Th Fr Sa";
+	day_names_pos_y = month_and_year_pos_y + calendar->style->font->height + 20;
+	day_names = calendar_get_week_fmt();
 
 	label_render_onto(
-		day_names, calendar->style->font, calendar->style->foreground,
+		day_names, calendar->style->font, 0xffffff,
 		day_names_pos_x, day_names_pos_y, bmp
 	);
 
