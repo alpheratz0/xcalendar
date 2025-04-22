@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022-2024 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2025 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -145,6 +145,14 @@ window_set_override_redirect(xcb_connection_t *conn, xcb_window_t wid,
 }
 
 static void
+window_set_fullscreen(xcb_connection_t *conn, xcb_window_t wid)
+{
+	xcb_atom_t _NET_WM_STATE_FULLSCREEN = xatom(conn, "_NET_WM_STATE_FULLSCREEN");
+	xcb_atom_t _NET_WM_STATE = xatom(conn, "_NET_WM_STATE");
+	xcb_change_property(conn, XCB_PROP_MODE_REPLACE, wid, _NET_WM_STATE, XCB_ATOM_ATOM, 32, 1, &_NET_WM_STATE_FULLSCREEN);
+}
+
+static void
 window_enable_wm_delete_window(xcb_connection_t *conn, xcb_window_t wid)
 {
 	xcb_change_property(
@@ -185,7 +193,7 @@ window_set_wm_class(xcb_connection_t *conn, xcb_window_t wid,
 }
 
 extern struct window *
-window_create(const char *title, const char *class)
+window_create(const char *title, const char *class, bool is_override_redirect)
 {
 	xcb_connection_t *conn;
 	xcb_screen_t *screen;
@@ -231,19 +239,27 @@ window_create(const char *title, const char *class)
 
 	window_set_wm_name(conn, wid, title);
 	window_set_wm_class(conn, wid, class, class);
-	window_set_override_redirect(conn, wid, 0x1);
+
+	if (is_override_redirect) {
+		window_set_override_redirect(conn, wid, 0x1);
+	} else {
+		window_set_fullscreen(conn, wid);
+	}
+
 	window_enable_wm_delete_window(conn, wid);
 
 	xcb_map_window(conn, wid);
 
-	for (grab_attempt = 10; grab_attempt >= 1; --grab_attempt) {
-		if (grab_keyboard(conn, wid)) break;
-		if (grab_attempt == 1) die("failed to grab keyboard");
-		usleep(100000);
-	}
+	if (is_override_redirect) {
+		for (grab_attempt = 10; grab_attempt >= 1; --grab_attempt) {
+			if (grab_keyboard(conn, wid)) break;
+			if (grab_attempt == 1) die("failed to grab keyboard");
+			usleep(100000);
+		}
 
-	xcb_set_input_focus(conn, XCB_INPUT_FOCUS_POINTER_ROOT, wid,
-			XCB_CURRENT_TIME);
+		xcb_set_input_focus(conn, XCB_INPUT_FOCUS_POINTER_ROOT, wid,
+				XCB_CURRENT_TIME);
+	}
 
 	xcb_flush(conn);
 
@@ -253,6 +269,7 @@ window_create(const char *title, const char *class)
 	window->connection = conn;
 	window->screen = screen;
 	window->id = wid;
+	window->override_redirect = is_override_redirect;
 	window->revert_focus = revert_focus;
 	window->image = image;
 	window->bmp = bmp;
@@ -349,7 +366,8 @@ window_set_key_press_callback(struct window *window, window_key_press_callback_t
 extern void
 window_free(struct window *window)
 {
-	set_focused_window(window->connection, window->revert_focus);
+	if (window->override_redirect)
+		set_focused_window(window->connection, window->revert_focus);
 	xcb_key_symbols_free(window->ksyms);
 	xcb_free_gc(window->connection, window->gc);
 	xcb_disconnect(window->connection);

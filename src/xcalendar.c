@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022-2024 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2025 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -95,10 +95,12 @@ main(int argc, char **argv)
 {
 	struct font *font;
 	struct calendar_style style;
+	bool override_redirect = true;
 
 	while (++argv, --argc > 0) {
 		if ((*argv)[0] == '-' && (*argv)[1] != '\0' && (*argv)[2] == '\0') {
 			switch ((*argv)[1]) {
+			case 'f': override_redirect = false; break;
 			case 'h': usage(); break;
 			case 'v': version(); break;
 			default: die("invalid option %s", *argv); break;
@@ -109,7 +111,7 @@ main(int argc, char **argv)
 	}
 
 	setlocale(LC_TIME, "");
-	window = window_create("xcalendar", "xcalendar");
+	window = window_create("xcalendar", "xcalendar", override_redirect);
 	font = font_load("Monospace", 40);
 	style = calendar_style_from(font, 0xffffff, 0x000000);
 	calendar = calendar_create(&style);

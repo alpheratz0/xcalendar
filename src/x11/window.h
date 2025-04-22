@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022-2024 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2025 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -19,6 +19,7 @@
 #ifndef __XCALENDAR_X11_WINDOW_H__
 #define __XCALENDAR_X11_WINDOW_H__
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <xcb/xcb.h>
 #include <xcb/xcb_image.h>
@@ -32,6 +33,7 @@ typedef void (*window_key_press_callback_t)(xcb_keysym_t key);
 struct window {
 	xcb_window_t id;
 	xcb_window_t revert_focus;
+	bool override_redirect;
 	xcb_connection_t *connection;
 	xcb_screen_t *screen;
 	xcb_key_symbols_t *ksyms;
@@ -43,7 +45,7 @@ struct window {
 };
 
 extern struct window *
-window_create(const char *title, const char *class);
+window_create(const char *title, const char *class, bool is_override_redirect);
 
 extern void
 window_loop_start(struct window *window);
