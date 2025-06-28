@@ -250,6 +250,8 @@ window_create(const char *title, const char *class, bool is_override_redirect)
 
 	xcb_map_window(conn, wid);
 
+	xcb_flush(conn);
+
 	if (is_override_redirect) {
 		for (grab_attempt = 10; grab_attempt >= 1; --grab_attempt) {
 			if (grab_keyboard(conn, wid)) break;
@@ -260,8 +262,6 @@ window_create(const char *title, const char *class, bool is_override_redirect)
 		xcb_set_input_focus(conn, XCB_INPUT_FOCUS_POINTER_ROOT, wid,
 				XCB_CURRENT_TIME);
 	}
-
-	xcb_flush(conn);
 
 	window = xmalloc(sizeof(struct window));
 
