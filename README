@@ -8,8 +8,8 @@
 simple X11 program that lets you navigate through the calendar.
 For more information about it's usage check `man xcalendar`.
 
-This program requires libxcb, libxcb-image, libxcb-keysyms,
-libfreetype2 and libfontconfig to be installed.
+This program requires libxcb, libxcb-image, libxcb-keysyms, libxkbcommon,
+libfreetype2, libfontconfig and libgrapheme to be installed.
 In order to build this program you need to run `make`.
 
 This program is free software; you can redistribute it

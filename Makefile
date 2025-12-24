@@ -17,7 +17,7 @@ OBJ=\
 all: xcalendar
 
 xcalendar: $(OBJ)
-	$(CC) $(LDFLAGS) -o xcalendar $(OBJ)
+	$(CC) $(OBJ) $(LDFLAGS) -o xcalendar
 
 clean:
 	rm -f xcalendar $(OBJ) xcalendar-$(VERSION).tar.gz

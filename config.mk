@@ -9,7 +9,7 @@ APPPREFIX = $(PREFIX)/share/applications
 
 PKG_CONFIG = pkg-config
 
-DEPENDENCIES = xcb freetype2 xcb-image xcb-keysyms fontconfig libgrapheme
+DEPENDENCIES = xcb freetype2 xcb-image xcb-keysyms fontconfig libgrapheme xkbcommon
 
 INCS = $(shell $(PKG_CONFIG) --cflags $(DEPENDENCIES)) -Iinclude
 LIBS = $(shell $(PKG_CONFIG) --libs $(DEPENDENCIES))
