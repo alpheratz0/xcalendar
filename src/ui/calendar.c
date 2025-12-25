@@ -16,6 +16,7 @@
 
 */
 
+#include <math.h>
 #include <langinfo.h>
 #include <errno.h>
 #include <string.h>
@@ -260,6 +261,10 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 	day_max_pos_x = day_names_pos_x + calendar->style->font->width * 21;
 	now = calendar_get_current_time();
 
+	int cur_day_x0, cur_day_x1, cur_day_y0, cur_day_y1;
+
+	cur_day_x0 = cur_day_x1 = cur_day_y0 = cur_day_y1 = -1;
+
 	for (i = 0; i < numdays; ++i) {
 		snprintf(day, sizeof(day), "%3d", i+1);
 
@@ -267,6 +272,11 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 		    now.tm_mon == calendar->month &&
 		    now.tm_mday == i + 1)
 		{
+			cur_day_x0 = day_pos_x + calendar->style->font->width * (i >= 9 ? 1 : 2);
+			cur_day_y0 = day_pos_y;
+			cur_day_x1 = cur_day_x0 + calendar->style->font->width * (i >= 9 ? 2 : 1);
+			cur_day_y1 = cur_day_y0 + calendar->style->font->height;
+
 			bitmap_rect(
 				bmp, day_pos_x + calendar->style->font->width * (i >= 9 ? 1 : 2),
 				day_pos_y, calendar->style->font->width * (i >= 9 ? 2 : 1),
@@ -281,6 +291,51 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 		else {
 			label_render_onto(
 				day, calendar->style->font, calendar->style->foreground,
+				day_pos_x, day_pos_y, bmp
+			);
+		}
+
+		day_pos_x += calendar->style->font->width * 3;
+
+		if (day_pos_x == day_max_pos_x) {
+			day_pos_x = day_names_pos_x;
+			day_pos_y += calendar->style->font->height;
+		}
+	}
+
+	if (cur_day_x0 != -1) {
+		for (int x = 0; x < bmp->width; ++x) {
+			if (x >= cur_day_x0 && x < cur_day_x1)
+				continue;
+			double intensity;
+			if (x < cur_day_x0)
+				intensity = (double)x / cur_day_x0;
+			else
+				intensity = (double)(bmp->width - x) / (bmp->width - cur_day_x1);
+			intensity = pow(intensity, 4);
+			int gray = intensity * 0xff;
+			if (gray > 0xff) gray = 0xff;
+			uint32_t col = (gray << 16) | (gray << 8) | (gray);
+			bitmap_rect(bmp, x, cur_day_y0, 1, cur_day_y1 - cur_day_y0, col);
+		}
+	}
+
+	numdays = calendar_get_month_days(calendar->month, calendar->year);
+	month_offset = calendar_get_month_offset(calendar->month, calendar->year);
+	day_pos_x = day_names_pos_x + month_offset * 3 * calendar->style->font->width;
+	day_pos_y = day_names_pos_y + calendar->style->font->height;
+	day_max_pos_x = day_names_pos_x + calendar->style->font->width * 21;
+	now = calendar_get_current_time();
+
+	for (i = 0; i < numdays; ++i) {
+		snprintf(day, sizeof(day), "%3d", i+1);
+
+		if (now.tm_year == calendar->year - 1900 &&
+		    now.tm_mon == calendar->month &&
+		    cur_day_y0 == day_pos_y)
+		{
+			label_render_onto(
+				day, calendar->style->font, calendar->style->background,
 				day_pos_x, day_pos_y, bmp
 			);
 		}

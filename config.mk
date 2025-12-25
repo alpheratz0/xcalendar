@@ -12,7 +12,7 @@ PKG_CONFIG = pkg-config
 DEPENDENCIES = xcb freetype2 xcb-image xcb-keysyms fontconfig libgrapheme
 
 INCS = $(shell $(PKG_CONFIG) --cflags $(DEPENDENCIES)) -Iinclude
-LIBS = $(shell $(PKG_CONFIG) --libs $(DEPENDENCIES))
+LIBS = $(shell $(PKG_CONFIG) --libs $(DEPENDENCIES)) -lm
 
 CFLAGS = -std=c99 -pedantic -Wall -Wextra -Os $(INCS) -DVERSION=\"$(VERSION)\"
 LDFLAGS = -s $(LIBS)
