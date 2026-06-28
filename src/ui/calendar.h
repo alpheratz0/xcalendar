@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2026 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -23,9 +23,11 @@
 
 #include "../base/font.h"
 #include "../base/bitmap.h"
+#include "events.h"
 
 struct calendar_style {
 	struct font *font;
+	struct font *events_font;
 	uint32_t foreground;
 	uint32_t background;
 };
@@ -33,6 +35,7 @@ struct calendar_style {
 struct calendar {
 	struct calendar_style *style;
 	int month, year;
+	struct events *events;
 };
 
 extern struct calendar_style

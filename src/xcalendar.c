@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022-2025 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2026 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -94,6 +94,7 @@ int
 main(int argc, char **argv)
 {
 	struct font *font;
+	struct font *events_font;
 	struct calendar_style style;
 	bool override_redirect = true;
 
@@ -114,6 +115,8 @@ main(int argc, char **argv)
 	window = window_create("xcalendar", "xcalendar", override_redirect);
 	font = font_load("Monospace", 40);
 	style = calendar_style_from(font, 0xffffff, 0x000000);
+	events_font = font_load("Monospace", 18);
+	style.events_font = events_font;
 	calendar = calendar_create(&style);
 
 	calendar_render_onto(calendar, window->bmp);
@@ -121,6 +124,7 @@ main(int argc, char **argv)
 	window_loop_start(window);
 
 	font_unload(font);
+	font_unload(events_font);
 	calendar_free(calendar);
 	window_free(window);
 

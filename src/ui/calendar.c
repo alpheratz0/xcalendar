@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2022-2024 <alpheratz99@protonmail.com>
+	Copyright (C) 2022-2026 <alpheratz99@protonmail.com>
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License version 2 as published by
@@ -29,7 +29,17 @@
 #include "../util/debug.h"
 #include "../util/xmalloc.h"
 #include "label.h"
+#include "events.h"
 #include "calendar.h"
+
+/* color of the dot marking days that have events */
+#define CALENDAR_EVENT_DOT_COLOR 0xff5555
+
+/* events panel geometry: the gap between the grid and the panel (in calendar
+   columns) and the panel's reserved width (in events-font columns). Both are
+   used to center the calendar and the panel together as a single block. */
+#define CALENDAR_PANEL_GAP 3
+#define CALENDAR_PANEL_WIDTH 26
 
 static inline int
 get_first_weekday(void)
@@ -140,12 +150,42 @@ calendar_get_month_days(int month, int year)
 	return 29;
 }
 
+static void
+calendar_draw_indicator(struct bitmap *bmp, int cx, int cy, int r, uint32_t color)
+{
+	int dx, dy;
+
+	for (dy = -r; dy <= r; ++dy)
+		for (dx = -r; dx <= r; ++dx)
+			if (dx * dx + dy * dy <= r * r)
+				bitmap_set(bmp, cx + dx, cy + dy, color);
+}
+
+/* top-left position of the month/year title; the rest of the layout derives
+   from it. The calendar grid and the events panel are centered together as a
+   single block so the whole thing stays balanced on screen. */
+static void
+calendar_base_pos(const struct calendar *calendar, const struct bitmap *bmp,
+                  int *x, int *y)
+{
+	const struct font *font = calendar->style->font;
+	const struct font *events_font = calendar->style->events_font;
+	int block_width;
+
+	block_width = (int)font->width * (21 + CALENDAR_PANEL_GAP) +
+		(int)events_font->width * CALENDAR_PANEL_WIDTH;
+
+	*x = ((int)bmp->width - block_width) / 2;
+	*y = ((int)bmp->height - (int)font->height * 7 - 20) / 2;
+}
+
 extern struct calendar_style
 calendar_style_from(struct font *font, uint32_t foreground, uint32_t background)
 {
 	struct calendar_style style;
 
 	style.font = font;
+	style.events_font = font; /* overridden by the caller; never left unset */
 	style.foreground = foreground;
 	style.background = background;
 
@@ -160,6 +200,7 @@ calendar_create(struct calendar_style *style)
 	calendar = xmalloc(sizeof(struct calendar));
 
 	calendar->style = style;
+	calendar->events = events_load(events_default_path());
 
 	calendar_goto_current_month(calendar);
 
@@ -220,8 +261,7 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 	char month_and_year[50];
 	int month_and_year_pos_x, month_and_year_pos_y;
 
-	month_and_year_pos_x = (bmp->width - calendar->style->font->width * 21) / 2;
-	month_and_year_pos_y = (bmp->height - calendar->style->font->height * 7 - 20) / 2;
+	calendar_base_pos(calendar, bmp, &month_and_year_pos_x, &month_and_year_pos_y);
 
 	snprintf(month_and_year, sizeof(month_and_year), "%s %d", calendar_get_month_name(calendar->month), calendar->year);
 
@@ -285,6 +325,20 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 			);
 		}
 
+		/* mark days that have events with a small dot at the top-right */
+		if (events_on_day(calendar->events, calendar->month, calendar->year, i + 1) > 0) {
+			int r, cx, cy;
+
+			r = (int)calendar->style->font->height / 12;
+			if (r < 3)
+				r = 3;
+
+			cx = day_pos_x + (int)calendar->style->font->width * 3 - r - 1;
+			cy = day_pos_y + r + 1;
+
+			calendar_draw_indicator(bmp, cx, cy, r, CALENDAR_EVENT_DOT_COLOR);
+		}
+
 		day_pos_x += calendar->style->font->width * 3;
 
 		if (day_pos_x == day_max_pos_x) {
@@ -292,10 +346,31 @@ calendar_render_onto(struct calendar *calendar, struct bitmap *bmp)
 			day_pos_y += calendar->style->font->height;
 		}
 	}
+
+	/* render the viewed month's events in a smaller font to the right; the
+	   first event lines up with the weekday names */
+	struct font *events_font;
+	int panel_x, list_y;
+
+	events_font = calendar->style->events_font;
+	panel_x = month_and_year_pos_x +
+		(int)calendar->style->font->width * (21 + CALENDAR_PANEL_GAP);
+	/* drop the list so the first event's baseline matches the weekday names
+	   (a glyph's baseline sits font->size below its top) */
+	list_y = day_names_pos_y +
+		(int)calendar->style->font->size - (int)events_font->size;
+
+	if (events_render_month_onto(calendar->events, calendar->month,
+			calendar->year, events_font, calendar->style->foreground,
+			panel_x, list_y, bmp) == 0) {
+		label_render_onto("(none)", events_font, calendar->style->foreground,
+			panel_x, list_y, bmp);
+	}
 }
 
 extern void
 calendar_free(struct calendar *calendar)
 {
+	events_free(calendar->events);
 	free(calendar);
 }
