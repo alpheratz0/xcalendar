@@ -9,6 +9,7 @@ OBJ=\
 	src/xcalendar.o \
 	src/ui/label.o \
 	src/ui/calendar.o \
+	src/ui/events.o \
 	src/x11/window.o \
 	src/util/color.o \
 	src/util/debug.o \
