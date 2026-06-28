@@ -1,0 +1,13 @@
+# Example xcalendar events file (libcalrepeat .calendar format).
+#
+# Copy this to the path xcalendar reads from (default
+# ~/.config/xcalendar/events.calendar, or $XCALENDAR_CALENDAR).
+#
+# This is meant for birthdays, anniversaries and other important dates, not for
+# everyday reminders.
+#
+# One event per line: an optional name followed by " - " and a recurrence rule,
+# or just a rule. Lines that are blank or start with '#' are ignored.
+
+Aurora's Birthday - every 15th of june
+New Year - every 1th of january

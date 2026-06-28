@@ -1,4 +1,4 @@
-.Dd April 21, 2025
+.Dd June 27, 2026
 .Dt XCALENDAR 1
 .Sh NAME
 .Nm xcalendar
@@ -25,6 +25,26 @@ goto previous/next year with j/k keys
 goto current year & month with c key
 .It
 exit the program with q/escape keys
+.El
+.Sh EVENTS
+.Nm
+reads recurring events (birthdays, anniversaries and other important dates)
+from a
+.Xr calrepeat 5
+.Pa .calendar
+file using libcalrepeat. Every day that has an event is marked with a small dot
+in the top-right corner, and a list to the right of the calendar
+shows the events of the month being viewed.
+.Pp
+The file is looked up via the
+.Ev XCALENDAR_CALENDAR
+environment variable; if it is unset the compile-time default
+.Pa ~/.config/xcalendar/events.calendar
+is used. A missing or unreadable file is treated as having no events.
+.Sh ENVIRONMENT
+.Bl -tag -width indent
+.It Ev XCALENDAR_CALENDAR
+Path of the events file to read.
 .El
 .Sh EXAMPLES
 .Bl -tag -width indent
