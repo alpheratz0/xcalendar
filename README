@@ -1,18 +1,30 @@
-                    __               __
-   _  ___________ _/ /__  ____  ____/ /___ ______
-  | |/_/ ___/ __ `/ / _ \/ __ \/ __  / __ `/ ___/
- _>  </ /__/ /_/ / /  __/ / / / /_/ / /_/ / /
-/_/|_|\___/\__,_/_/\___/_/ /_/\__,_/\__,_/_/
+# xcalendar
 
+![xcalendar](misc/screenshot-1.png)
 
-simple X11 program that lets you navigate through the calendar.
-For more information about it's usage check `man xcalendar`.
+## Description
 
-This program requires libxcb, libxcb-image, libxcb-keysyms, libxkbcommon,
-libfreetype2, libfontconfig, libgrapheme and libcalrepeat to be installed.
-In order to build this program you need to run `make`.
+xcalendar is a simple X11 program that lets you navigate through the calendar
+and shows your recurring events (birthdays, anniversaries and other important
+dates).
 
-This program is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License
-version 2 as published by the Free Software Foundation.
-See COPYING for more details.
+For usage instructions, check:
+
+```sh
+$ man xcalendar
+```
+
+## Dependencies
+
+To run xcalendar, you need the following libraries installed: libxcb, libxcb-image, libxcb-keysyms, libxkbcommon, libfreetype2, libfontconfig, libgrapheme and libcalrepeat
+
+## Building and installing
+
+```sh
+$ make
+$ sudo make PREFIX=/usr install
+```
+
+## License
+
+Code is licensed under GNU's General Public License v2. See `COPYING` for details.
